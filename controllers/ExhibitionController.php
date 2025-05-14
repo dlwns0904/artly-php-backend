@@ -31,10 +31,9 @@ class ExhibitionController {
     // 전시회 등록
     public function createExhibition() {
         $data = json_decode(file_get_contents('php://input'), true);
-        $createdId = $this->model->create($data);
+        $createdExhibition = $this->model->create($data);
 
-        if ($createdId) {
-            $createdExhibition = $this->model->getById($createdId);
+        if ($createdExhibition) {
             http_response_code(201);
             echo json_encode([
                 'message' => 'Exhibition created successfully',

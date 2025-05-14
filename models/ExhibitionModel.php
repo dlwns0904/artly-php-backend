@@ -25,7 +25,7 @@ class ExhibitionModel {
             (exhibition_title, exhibition_poster, exhibition_category, exhibition_start_date, exhibition_end_date, exhibition_start_time, exhibition_end_time, exhibition_location, exhibition_price, gallery_id, exhibition_tag, exhibition_status, create_dttm, update_dttm)
             VALUES (:title, :poster, :category, :start_date, :end_date, :start_time, :end_time, :location, :price, :gallery_id, :tag, :status, NOW(), NOW())");
 
-        return $stmt->execute([
+        $stmt->execute([
             ':title' => $data['exhibition_title'],
             ':poster' => $data['exhibition_poster'],
             ':category' => $data['exhibition_category'],
@@ -39,6 +39,13 @@ class ExhibitionModel {
             ':tag' => $data['exhibition_tag'],
             ':status' => $data['exhibition_status']
         ]);
+        
+        // 생성된 데이터의 ID 가져오기
+        $id = $this->pdo->lastInsertId();
+        
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function update($id, $data) {
