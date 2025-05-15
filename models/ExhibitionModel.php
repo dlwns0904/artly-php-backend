@@ -8,9 +8,23 @@ class ExhibitionModel {
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function getAll($filters = []) {
-        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition");
-        $stmt->execute();
+    # 전시회 목록
+    public function getExhibitions($filters = []) {
+        $sql = "SELECT * FROM apiserver_exhibition WHERE 1=1";
+        $params = [];
+
+        if (!empty($filters['status'])) {
+            $sql .= " AND exhibition_status = :status";
+            $params[':status'] = $filters['status'];
+        }
+
+        if (!empty($filters['category'])) {
+            $sql .= " AND exhibition_category = :category";
+            $params[':category'] = $filters['category'];
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

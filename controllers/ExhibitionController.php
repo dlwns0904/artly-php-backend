@@ -10,8 +10,12 @@ class ExhibitionController {
 
     // 전시회 목록 조회
     public function getExhibitionList() {
-        # 필터 적용 필요
-        $exhibitions = $this->model->getAll();
+        // 쿼리 파라미터 읽기
+        $filters = [
+            'status' => $_GET['status'] ?? null,
+            'category' => $_GET['category'] ?? null,
+        ];
+        $exhibitions = $this->model->getExhibitions($filters);
         header('Content-Type: application/json');
         echo json_encode($exhibitions, JSON_UNESCAPED_UNICODE);
     }
