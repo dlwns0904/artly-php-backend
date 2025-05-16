@@ -8,9 +8,23 @@ class ExhibitionModel {
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function getAll($filters = []) {
-        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition");
-        $stmt->execute();
+    # 전시회 목록
+    public function getExhibitions($filters = []) {
+        $sql = "SELECT * FROM APIServer_exhibition WHERE 1=1";
+        $params = [];
+
+        if (!empty($filters['status'])) {
+            $sql .= " AND exhibition_status = :status";
+            $params[':status'] = $filters['status'];
+        }
+
+        if (!empty($filters['category'])) {
+            $sql .= " AND exhibition_category = :category";
+            $params[':category'] = $filters['category'];
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -21,7 +35,7 @@ class ExhibitionModel {
     }
 
     public function create($data) {
-        $stmt = $this->pdo->prepare("INSERT INTO APIServer_exhibition 
+        $stmt = $this->pdo->prepare("INSERT INTO APIServer_exhibition
             (exhibition_title, exhibition_poster, exhibition_category, exhibition_start_date, exhibition_end_date, exhibition_start_time, exhibition_end_time, exhibition_location, exhibition_price, gallery_id, exhibition_tag, exhibition_status, create_dttm, update_dttm)
             VALUES (:title, :poster, :category, :start_date, :end_date, :start_time, :end_time, :location, :price, :gallery_id, :tag, :status, NOW(), NOW())");
 
@@ -39,10 +53,10 @@ class ExhibitionModel {
             ':tag' => $data['exhibition_tag'],
             ':status' => $data['exhibition_status']
         ]);
-        
+
         // 생성된 데이터의 ID 가져오기
         $id = $this->pdo->lastInsertId();
-        
+
         $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition WHERE id = :id");
         $stmt->execute([':id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -87,3 +101,4 @@ class ExhibitionModel {
         return $stmt->execute(['id' => $id]);
     }
 }
+
