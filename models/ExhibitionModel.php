@@ -1,4 +1,9 @@
 <?php
+namespace Models;
+
+use \PDO;
+
+
 class ExhibitionModel {
     private $pdo;
 

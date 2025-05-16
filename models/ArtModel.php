@@ -1,4 +1,9 @@
 <?php
+namespace Models;
+
+use \PDO;
+
+
 class ArtModel {
     private $pdo;
 

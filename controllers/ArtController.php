@@ -1,6 +1,9 @@
 <?php
+namespace Controllers;
 use OpenApi\Annotations as OA; 
-require_once __DIR__ . '/../models/ArtModel.php';
+
+use Models\ArtModel;
+
 
 class ArtController {
     private $model;

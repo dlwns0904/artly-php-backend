@@ -4,10 +4,12 @@
     "doctrine/annotations": "^1.14"
   },
   "autoload": {
+    "psr-4": {
+      "Controllers\\": "controllers/",
+      "Models\\": "models/"
+    },
     "classmap": [
-      "controllers/",
-      "models/",
-      "openapi.php"           
+      "openapi.php"
     ]
   }
 }
