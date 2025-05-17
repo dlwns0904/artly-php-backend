@@ -4,6 +4,8 @@ namespace Controllers;
 use OpenApi\Annotations as OA;
 use Models\GalleryModel;
 
+
+
 /**
  * @OA\Tag(
  *     name="Gallery",
@@ -69,38 +71,50 @@ class GalleryController {
     }
 
     /**
-     * @OA\Get(
-     *     path="/api/galleries/{id}",
-     *     summary="갤러리 상세 조회",
-     *     tags={"Gallery"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="갤러리 ID",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="갤러리 상세 조회 성공",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="gallery_name", type="string"),
-     *             @OA\Property(property="gallery_image", type="string"),
-     *             @OA\Property(property="gallery_address", type="string"),
-     *             @OA\Property(property="gallery_start_time", type="string"),
-     *             @OA\Property(property="gallery_end_time", type="string"),
-     *             @OA\Property(property="gallery_closed_day", type="string"),
-     *             @OA\Property(property="gallery_category", type="string"),
-     *             @OA\Property(property="gallery_description", type="string")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="갤러리 없음"
-     *     )
-     * )
-     */
+ * @OA\Get(
+ *     path="/api/galleries/{id}",
+ *     summary="갤러리 상세 조회",
+ *     tags={"Gallery"},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         description="갤러리 ID",
+ *         required=true,
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="갤러리 상세 조회 성공",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="id", type="integer"),
+ *             @OA\Property(property="gallery_name", type="string"),
+ *             @OA\Property(property="gallery_image", type="string"),
+ *             @OA\Property(property="gallery_address", type="string"),
+ *             @OA\Property(property="gallery_start_time", type="string"),
+ *             @OA\Property(property="gallery_end_time", type="string"),
+ *             @OA\Property(property="gallery_closed_day", type="string"),
+ *             @OA\Property(property="gallery_category", type="string"),
+ *             @OA\Property(property="gallery_description", type="string"),
+ *             @OA\Property(
+ *                 property="exhibitions",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="exhibition_title", type="string"),
+ *                     @OA\Property(property="exhibition_poster", type="string"),
+ *                     @OA\Property(property="exhibition_start_date", type="string", format="date"),
+ *                     @OA\Property(property="exhibition_end_date", type="string", format="date")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="갤러리 없음"
+ *     )
+ * )
+ */
+
     public function getGalleryById($id) {
         $gallery = $this->model->getById($id);
         if ($gallery) {

@@ -41,14 +41,36 @@ class GalleryModel {
     }
 
     public function getById($id) {
-        $stmt = $this->pdo->prepare("
-            SELECT id, gallery_name, gallery_image, gallery_address, gallery_start_time,
-                   gallery_end_time, gallery_closed_day, gallery_category, gallery_description
-            FROM APIServer_gallery
-            WHERE id = :id
-        ");
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    // 갤러리 상세 정보
+    $stmt = $this->pdo->prepare("
+        SELECT id, gallery_name, gallery_image, gallery_address, gallery_start_time,
+               gallery_end_time, gallery_closed_day, gallery_category, gallery_description
+        FROM APIServer_gallery
+        WHERE id = :id
+    ");
+    $stmt->execute([':id' => $id]);
+    $gallery = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$gallery) {
+        return null;
     }
+
+    // + 해당 갤러리의 전시 중인 전시들
+    $stmt2 = $this->pdo->prepare("
+        SELECT id, exhibition_title, exhibition_poster, exhibition_start_date, exhibition_end_date
+        FROM APIServer_exhibition
+        WHERE gallery_id = :id AND exhibition_status = 'exhibited'
+    ");
+    $stmt2->execute([':id' => $id]);
+    $exhibitions = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+
+    // 결과에 +
+    $gallery['exhibitions'] = $exhibitions;
+
+    // 반환
+    return $gallery;
+}
+
+
 }
 

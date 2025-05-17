@@ -17,7 +17,7 @@ class ArtistModel {
     public function fetchArtists($category) {
         if ($category === 'onExhibition') {
             $sql = "
-                SELECT DISTINCT a.id, a.artist_name AS name, a.artist_category AS field
+                SELECT DISTINCT a.id, a.artist_name AS name,a.artist_image AS imgUrl, a.artist_category AS field
                 FROM APIServer_artist a
                 JOIN APIServer_exhibition_participation ep ON a.id = ep.artist_id
                 JOIN APIServer_exhibition e ON ep.exhibition_id = e.id
@@ -25,7 +25,7 @@ class ArtistModel {
             ";
         } else {
             $sql = "
-                SELECT id, artist_name AS name, artist_category AS field
+                SELECT id, artist_name AS name, artist_image AS imgUrl, artist_category AS field
                 FROM APIServer_artist
             ";
         }

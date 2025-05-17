@@ -24,6 +24,7 @@ class ArtistController {
      *     @OA\JsonContent(type="array", @OA\Items(
      *       @OA\Property(property="id",    type="integer", example=1),
      *       @OA\Property(property="name",  type="string",  example="김길동"),
+     *       @OA\Property(property="img",   type="string",  example="image.url"), 	
      *       @OA\Property(property="field", type="string",  example="회화")
      *     ))
      *   )

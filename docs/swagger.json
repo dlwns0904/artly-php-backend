@@ -285,6 +285,10 @@
                                                 "type": "string",
                                                 "example": "김길동"
                                             },
+                                            "img": {
+                                                "type": "string",
+                                                "example": "image.url"
+                                            },
                                             "field": {
                                                 "type": "string",
                                                 "example": "회화"
@@ -831,6 +835,31 @@
                                         },
                                         "gallery_description": {
                                             "type": "string"
+                                        },
+                                        "exhibitions": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "exhibition_title": {
+                                                        "type": "string"
+                                                    },
+                                                    "exhibition_poster": {
+                                                        "type": "string"
+                                                    },
+                                                    "exhibition_start_date": {
+                                                        "type": "string",
+                                                        "format": "date"
+                                                    },
+                                                    "exhibition_end_date": {
+                                                        "type": "string",
+                                                        "format": "date"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
                                         }
                                     },
                                     "type": "object"
