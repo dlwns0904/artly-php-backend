@@ -1,0 +1,16 @@
+{
+  "require": {
+    "zircote/swagger-php": "^4.11",
+    "doctrine/annotations": "^1.14"
+  },
+  "autoload": {
+    "psr-4": {
+      "Controllers\\": "controllers/",
+      "Models\\": "models/"
+    },
+    "classmap": [
+      "openapi.php"
+    ]
+  }
+}
+

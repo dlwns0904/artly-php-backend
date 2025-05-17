@@ -1,107 +1,88 @@
 <?php
-// 이 줄이 반드시 routes.php 안에 있어야 함!
-$requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$requestMethod = $_SERVER['REQUEST_METHOD'];
+require_once __DIR__ . '/vendor/autoload.php';
 
-// URI 확인용 출력
-echo "현재 URI: $requestUri\n";
 
-if (
-    $requestUri === '/api/artist' ||
-    $requestUri === '/index.php/api/artist' ||
-    $requestUri === '/artly-backend/api/artist' ||
-    $requestUri === '/artly-backend/index.php/api/artist' ||
-    str_contains($requestUri, '/api/artist')
-) {
-    require_once __DIR__ . '/controllers/ArtistController.php';
-    $controller = new ArtistController();
-    $controller->getArtistList();
+use Controllers\ArtistController;
+use Controllers\ExhibitionController;
+use Controllers\ArtController;
+use Controllers\GalleryController;
+use Controllers\AnnouncementController;
+
+$requestUri     = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$requestMethod  = $_SERVER['REQUEST_METHOD'];
+
+/* ───────────────────────── Artist ───────────────────────── */
+
+if ($requestMethod === 'GET' && preg_match('#^/api/artists/(\d+)$#', $requestUri, $m)) {
+    (new ArtistController())->getArtistById($m[1]);
 }
-elseif (
-    $requestUri === '/' ||
-    $requestUri === '/index.php' ||
-    $requestUri === '/artly-backend/' ||
-    $requestUri === '/artly-backend/index.php'
-) {
+elseif ($requestMethod === 'GET' && preg_match('#^/api/artist$#', $requestUri)) {
+    (new ArtistController())->getArtistList();
+}
+
+/* ───────────────────────── Exhibition ───────────────────────── */
+
+elseif ($requestMethod === 'GET' && preg_match('#^/api/exhibitions/(\d+)$#', $requestUri, $m)) {
+    (new ExhibitionController())->getExhibitionById($m[1]);
+}
+elseif ($requestMethod === 'GET' && preg_match('#^/api/exhibitions$#', $requestUri)) {
+    (new ExhibitionController())->getExhibitionList();
+}
+elseif ($requestMethod === 'POST' && $requestUri === '/api/exhibitions') {
+    (new ExhibitionController())->createExhibition();
+}
+elseif ($requestMethod === 'PUT' && preg_match('#^/api/exhibitions/(\d+)$#', $requestUri, $m)) {
+    (new ExhibitionController())->updateExhibition($m[1]);
+}
+elseif ($requestMethod === 'DELETE' && preg_match('#^/api/exhibitions/(\d+)$#', $requestUri, $m)) {
+    (new ExhibitionController())->deleteExhibition($m[1]);
+}
+
+/* ───────────────────────── Art ───────────────────────── */
+
+elseif ($requestMethod === 'GET' && preg_match('#^/api/arts/(\d+)$#', $requestUri, $m)) {
+    (new ArtController())->getArtById($m[1]);
+}
+elseif ($requestMethod === 'GET' && preg_match('#^/api/arts$#', $requestUri)) {
+    (new ArtController())->getArtList();
+}
+elseif ($requestMethod === 'POST' && $requestUri === '/api/arts') {
+    (new ArtController())->createArt();
+}
+elseif ($requestMethod === 'PUT' && preg_match('#^/api/arts/(\d+)$#', $requestUri, $m)) {
+    (new ArtController())->updateArt($m[1]);
+}
+elseif ($requestMethod === 'DELETE' && preg_match('#^/api/arts/(\d+)$#', $requestUri, $m)) {
+    (new ArtController())->deleteArt($m[1]);
+}
+
+/* ───────────────────────── Gallery ───────────────────────── */
+
+elseif ($requestMethod === 'GET' && preg_match('#^/api/galleries/(\d+)$#', $requestUri, $m)) {
+    (new GalleryController())->getGalleryById($m[1]);
+}
+elseif ($requestMethod === 'GET' && preg_match('#^/api/galleries$#', $requestUri)) {
+    (new GalleryController())->getGalleryList();
+}
+
+/* ───────────────────────── Announcement ───────────────────────── */
+
+elseif ($requestMethod === 'GET' && preg_match('#^/api/announcements/(\d+)$#', $requestUri, $m)) {
+    (new AnnouncementController())->getAnnouncementById($m[1]);
+}
+elseif ($requestMethod === 'GET' && preg_match('#^/api/announcements$#', $requestUri)) {
+    (new AnnouncementController())->getAnnouncementList();
+}
+
+/* ───────────────────────── 기본/404 ───────────────────────── */
+
+elseif ($requestUri === '/' || $requestUri === '/index.php') {
     header('Content-Type: text/plain');
-    echo "kau artly";
-}
-
-################### 전시회 API #####################
-
-## 전시회 목록 api
-elseif (
-    ($requestUri === '/api/exhibitions' || str_contains($requestUri, '/api/exhibitions')) &&
-    $requestMethod === 'GET' &&
-    !preg_match('/\/api\/exhibitions\/\d+/', $requestUri)
-) {
-    require_once __DIR__ . '/controllers/ExhibitionController.php';
-    $controller = new ExhibitionController();
-    $controller->getExhibitionList();
-}
-## 전시회 상세 조회 (GET /api/exhibitions/:id)
-elseif (preg_match('/\/api\/exhibitions\/(\d+)/', $requestUri, $matches) && $requestMethod === 'GET') {
-    require_once __DIR__ . '/controllers/ExhibitionController.php';
-    $controller = new ExhibitionController();
-    $controller->getExhibitionById($matches[1]);
-}
-## 전시회 등록 (POST /api/exhibitions)
-elseif ($requestUri === '/api/exhibitions' && $requestMethod === 'POST') {
-    require_once __DIR__ . '/controllers/ExhibitionController.php';
-    $controller = new ExhibitionController();
-    $controller->createExhibition();
-}
-## 전시회 수정 (PUT /api/exhibitions/:id)
-elseif (preg_match('/\/api\/exhibitions\/(\d+)/', $requestUri, $matches) && $requestMethod === 'PUT') {
-    require_once __DIR__ . '/controllers/ExhibitionController.php';
-    $controller = new ExhibitionController();
-    $controller->updateExhibition($matches[1]);
-}
-## 전시회 삭제 (DELETE /api/exhibitions/:id)
-elseif (preg_match('/\/api\/exhibitions\/(\d+)/', $requestUri, $matches) && $requestMethod === 'DELETE') {
-    require_once __DIR__ . '/controllers/ExhibitionController.php';
-    $controller = new ExhibitionController();
-    $controller->deleteExhibition($matches[1]);
-}
-
-################### 작품 API #####################
-
-## 작품 목록 api
-elseif (
-    ($requestUri === '/api/arts' || str_contains($requestUri, '/api/arts')) &&
-    $requestMethod === 'GET' &&
-    !preg_match('/\/api\/arts\/\d+/', $requestUri)
-) {
-    require_once __DIR__ . '/controllers/ArtController.php';
-    $controller = new ArtController();
-    $controller->getArtList();
-}
-## 작품 상세 조회 (GET /api/arts/:id)
-elseif (preg_match('/\/api\/arts\/(\d+)/', $requestUri, $matches) && $requestMethod === 'GET') {
-    require_once __DIR__ . '/controllers/ArtController.php';
-    $controller = new ArtController();
-    $controller->getArtById($matches[1]);
-}
-## 작품 등록 (POST /api/arts)
-elseif ($requestUri === '/api/arts' && $requestMethod === 'POST') {
-    require_once __DIR__ . '/controllers/ArtController.php';
-    $controller = new ArtController();
-    $controller->createArt();
-}
-## 작품 수정 (PUT /api/arts/:id)
-elseif (preg_match('/\/api\/arts\/(\d+)/', $requestUri, $matches) && $requestMethod === 'PUT') {
-    require_once __DIR__ . '/controllers/ArtController.php';
-    $controller = new ArtController();
-    $controller->updateArt($matches[1]);
-}
-## 작품 삭제 (DELETE /api/arts/:id)
-elseif (preg_match('/\/api\/arts\/(\d+)/', $requestUri, $matches) && $requestMethod === 'DELETE') {
-    require_once __DIR__ . '/controllers/ArtController.php';
-    $controller = new ArtController();
-    $controller->deleteArt($matches[1]);
+    echo 'kau artly';
 }
 else {
     http_response_code(404);
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'Not found']);
+    echo json_encode(['error' => 'Not found'], JSON_UNESCAPED_UNICODE);
 }
+

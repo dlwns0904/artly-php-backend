@@ -1,0 +1,874 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Artly API",
+        "description": "Artly 예술 플랫폼 REST API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://artly.soundgram.co.kr",
+            "description": "Production"
+        }
+    ],
+    "paths": {
+        "/api/announcements": {
+            "get": {
+                "tags": [
+                    "Announcement"
+                ],
+                "summary": "공고 목록 조회",
+                "operationId": "dd0da6bd8ee3ee974d069597a5280c28",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "공고 카테고리 (공모, 프로그램, 채용)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "공고 목록 조회 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "title": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/announcements/{id}": {
+            "get": {
+                "tags": [
+                    "Announcement"
+                ],
+                "summary": "공고 상세 조회",
+                "operationId": "9731bacdb223309c68f608c33417ef99",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "공고 ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "공고 상세 조회 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "announcement_title": {
+                                            "type": "string"
+                                        },
+                                        "user_id": {
+                                            "type": "integer"
+                                        },
+                                        "announcement_poster": {
+                                            "type": "string"
+                                        },
+                                        "announcement_start_datetime": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "announcement_end_datetime": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "announcement_organizer": {
+                                            "type": "string"
+                                        },
+                                        "announcement_contact": {
+                                            "type": "string"
+                                        },
+                                        "announcement_support_detail": {
+                                            "type": "string"
+                                        },
+                                        "announcement_site_url": {
+                                            "type": "string"
+                                        },
+                                        "announcement_attachment_url": {
+                                            "type": "string"
+                                        },
+                                        "announcement_content": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "공고 없음"
+                    }
+                }
+            }
+        },
+        "/api/arts": {
+            "get": {
+                "tags": [
+                    "Art"
+                ],
+                "summary": "작품 목록 조회",
+                "operationId": "d2d79797d38f1f7b586250b4a71647f5",
+                "responses": {
+                    "200": {
+                        "description": "성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "art_title": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Art"
+                ],
+                "summary": "작품 등록",
+                "operationId": "240fcd2aa18be777a4e38a39bbd536e6",
+                "requestBody": {
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
+        "/api/arts/{id}": {
+            "get": {
+                "tags": [
+                    "Art"
+                ],
+                "summary": "작품 상세 조회",
+                "operationId": "6578856d0c4abf31081be8890c74428c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "성공"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Art"
+                ],
+                "summary": "작품 수정",
+                "operationId": "846fb90712902a8ffff9237b91f0aa66",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Art"
+                ],
+                "summary": "작품 삭제",
+                "operationId": "1da5bfc8c2549324916788d6c2ed34ab",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    }
+                }
+            }
+        },
+        "/api/artist": {
+            "get": {
+                "tags": [
+                    "Artist"
+                ],
+                "summary": "작가 목록 조회",
+                "operationId": "d7880fe118fad58495299585c086b1ff",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "카테고리(all | onExhibition)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "김길동"
+                                            },
+                                            "field": {
+                                                "type": "string",
+                                                "example": "회화"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/artists/{id}": {
+            "get": {
+                "tags": [
+                    "Artist"
+                ],
+                "summary": "작가 상세 조회",
+                "operationId": "ecb174169178a18e7ddc7a6f945a6c96",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "field": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/search": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "통합 검색 (작가, 전시회, 갤러리, 공고) (개발 중)",
+                "operationId": "66aca7636c797259270b0ec29295c2e8",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "검색 결과 반환",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "results": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "thumbnailUrl": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "exhibition",
+                                                            "artist",
+                                                            "gallery",
+                                                            "announcement"
+                                                        ]
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/exhibitions": {
+            "get": {
+                "tags": [
+                    "Exhibition"
+                ],
+                "summary": "전시회 목록 조회",
+                "operationId": "169f9346bbdef82170c9c2e15c40d29d",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "전시회 상태",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "전시회 카테고리",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "exhibition_title": {
+                                                "type": "string"
+                                            },
+                                            "exhibition_category": {
+                                                "type": "string"
+                                            },
+                                            "exhibition_status": {
+                                                "type": "string"
+                                            },
+                                            "create_dttm": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "update_dttm": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Exhibition"
+                ],
+                "summary": "전시회 등록",
+                "operationId": "6200a8781e1667091dd7dcca18f1f133",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "exhibition_title": {
+                                        "type": "string"
+                                    },
+                                    "exhibition_category": {
+                                        "type": "string"
+                                    },
+                                    "exhibition_status": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "등록 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "exhibition_title": {
+                                                    "type": "string"
+                                                },
+                                                "exhibition_category": {
+                                                    "type": "string"
+                                                },
+                                                "exhibition_status": {
+                                                    "type": "string"
+                                                },
+                                                "create_dttm": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "update_dttm": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/exhibitions/{id}": {
+            "get": {
+                "tags": [
+                    "Exhibition"
+                ],
+                "summary": "전시회 상세 조회",
+                "operationId": "0138500389c02641843a2eb219122d24",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "exhibition_title": {
+                                            "type": "string"
+                                        },
+                                        "exhibition_category": {
+                                            "type": "string"
+                                        },
+                                        "exhibition_status": {
+                                            "type": "string"
+                                        },
+                                        "create_dttm": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "update_dttm": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "전시회 없음"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Exhibition"
+                ],
+                "summary": "전시회 수정",
+                "operationId": "81e03364d2bddddee679668aed507026",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "exhibition_title": {
+                                        "type": "string"
+                                    },
+                                    "exhibition_category": {
+                                        "type": "string"
+                                    },
+                                    "exhibition_status": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "수정 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "exhibition_title": {
+                                                    "type": "string"
+                                                },
+                                                "exhibition_category": {
+                                                    "type": "string"
+                                                },
+                                                "exhibition_status": {
+                                                    "type": "string"
+                                                },
+                                                "create_dttm": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "update_dttm": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "전시회 없음"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Exhibition"
+                ],
+                "summary": "전시회 삭제",
+                "operationId": "0942ce95151d9395e6ca4a61df5f2934",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "삭제 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "전시회 없음 또는 삭제 실패"
+                    }
+                }
+            }
+        },
+        "/api/galleries": {
+            "get": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "갤러리 목록 조회",
+                "operationId": "88a0bdabcfc295c26157b15e704733e4",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "전시 진행 상태 (진행중 등)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "region",
+                        "in": "query",
+                        "description": "지역 (서울, 경기, 대구 등)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "공간 형태 (미술관, 박물관, 갤러리 등)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "갤러리 목록 조회 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "image": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/galleries/{id}": {
+            "get": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "갤러리 상세 조회",
+                "operationId": "95dc8045bc1a824172cadb32a21660a8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "갤러리 ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "갤러리 상세 조회 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "gallery_name": {
+                                            "type": "string"
+                                        },
+                                        "gallery_image": {
+                                            "type": "string"
+                                        },
+                                        "gallery_address": {
+                                            "type": "string"
+                                        },
+                                        "gallery_start_time": {
+                                            "type": "string"
+                                        },
+                                        "gallery_end_time": {
+                                            "type": "string"
+                                        },
+                                        "gallery_closed_day": {
+                                            "type": "string"
+                                        },
+                                        "gallery_category": {
+                                            "type": "string"
+                                        },
+                                        "gallery_description": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "갤러리 없음"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Announcement",
+            "description": "공고 관련 API"
+        },
+        {
+            "name": "Exhibition",
+            "description": "전시회 관련 API"
+        },
+        {
+            "name": "Gallery",
+            "description": "갤러리 관련 API"
+        },
+        {
+            "name": "Art",
+            "description": "Art"
+        },
+        {
+            "name": "Artist",
+            "description": "Artist"
+        },
+        {
+            "name": "Search",
+            "description": "Search"
+        }
+    ]
+}
