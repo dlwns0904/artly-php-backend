@@ -39,6 +39,7 @@ class ExhibitionController {
      * )
      */
     public function getExhibitionList() {
+        // 쿼리 파라미터 읽기
         $filters = [
             'status' => $_GET['status'] ?? null,
             'category' => $_GET['category'] ?? null,
