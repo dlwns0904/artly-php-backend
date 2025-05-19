@@ -5,6 +5,12 @@ use OpenApi\Annotations as OA;
 
 use Models\UserModel;
 use Middlewares\AuthMiddleware;
+/**
+ * @OA\Tag(
+ *     name="User",
+ *     description="사용자 관련 API"
+ * )
+ */
 
 class UserController {
     private $model;
@@ -14,6 +20,35 @@ class UserController {
         $this->auth = new AuthMiddleware();
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/users/me",
+     *     summary="마이페이지",
+     *     tags={"User"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="login_id", type="string"),
+     *             @OA\Property(property="login_pwd", type="string"),
+     *             @OA\Property(property="user_name", type="string"),
+     *             @OA\Property(property="user_gender", type="string"),
+     *             @OA\Property(property="user_age", type="integer"),
+     *             @OA\Property(property="user_email", type="string"),
+     *             @OA\Property(property="user_phone", type="string"),
+     *             @OA\Property(property="user_img", type="string"),
+     *             @OA\Property(property="user_keyword", type="string"),
+     *             @OA\Property(property="admin_flag", type="integer"),
+     *             @OA\Property(property="gallery_id", type="integer"),
+     *             @OA\Property(property="last_login_time", type="string", format="date-time"),
+     *             @OA\Property(property="reg_time", type="string", format="date-time"),
+     *             @OA\Property(property="update_dttm", type="string", format="date-time")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="프로필 없음")
+     * )
+     */
     public function getMe() {
         $user = $this->auth->authenticate(); // JWT 검사
         $userId = $user->user_id;
@@ -26,7 +61,55 @@ class UserController {
             echo json_encode(['message' => 'User not found']);
         }
     }
-    
+
+    /**
+     * @OA\Put(
+     *     path="/api/users/me",
+     *     summary="프로필 수정",
+     *     tags={"User"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="login_id", type="string"),
+     *             @OA\Property(property="login_pwd", type="string"),
+     *             @OA\Property(property="user_name", type="string"),
+     *             @OA\Property(property="user_gender", type="string"),
+     *             @OA\Property(property="user_age", type="integer"),
+     *             @OA\Property(property="user_email", type="string"),
+     *             @OA\Property(property="user_phone", type="string"),
+     *             @OA\Property(property="user_img", type="string"),
+     *             @OA\Property(property="user_keyword", type="string"),
+     *             @OA\Property(property="admin_flag", type="integer"),
+     *             @OA\Property(property="gallery_id", type="integer"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="수정 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+        *             @OA\Property(property="id", type="integer"),
+        *             @OA\Property(property="login_id", type="string"),
+        *             @OA\Property(property="login_pwd", type="string"),
+        *             @OA\Property(property="user_name", type="string"),
+        *             @OA\Property(property="user_gender", type="string"),
+        *             @OA\Property(property="user_age", type="integer"),
+        *             @OA\Property(property="user_email", type="string"),
+        *             @OA\Property(property="user_phone", type="string"),
+        *             @OA\Property(property="user_img", type="string"),
+        *             @OA\Property(property="user_keyword", type="string"),
+        *             @OA\Property(property="admin_flag", type="integer"),
+        *             @OA\Property(property="gallery_id", type="integer"),
+        *             @OA\Property(property="last_login_time", type="string", format="date-time"),
+        *             @OA\Property(property="reg_time", type="string", format="date-time"),
+        *             @OA\Property(property="update_dttm", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="수정 실패")
+     * )
+     */
     public function updateMe() {
         $user = $this->auth->authenticate(); // JWT 검사
         $userId = $user->user_id;
@@ -52,6 +135,46 @@ class UserController {
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/users/me/exhibitions",
+     *     summary="내 전시 일정",
+     *     tags={"User"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="성공",
+     *         @OA\JsonContent(
+    *             @OA\Property(property="id", type="integer"),
+    *             @OA\Property(property="user_id", type="integer"),
+    *             @OA\Property(property="session_id", type="integer"),
+    *             @OA\Property(property="reservation_datetime", type="string", format="date-time"),
+    *             @OA\Property(property="reservation_number_of_tickets", type="integer"),
+    *             @OA\Property(property="reservation_total_price", type="integer"),
+    *             @OA\Property(property="reservation_payment_method", type="string"),
+    *             @OA\Property(property="reservation_status", type="string"),
+    *             @OA\Property(property="create_dttm", type="string", format="date-time"),
+    *             @OA\Property(property="update_dttm", type="string", format="date-time"),
+    *             @OA\Property(property="exhibition_id", type="integer"),
+    *             @OA\Property(property="session_datetime", type="string", format="date-time"),
+    *             @OA\Property(property="session_total_capacity", type="integer"),
+    *             @OA\Property(property="session_reservation_capacity", type="integer"),
+    *             @OA\Property(property="exhibition_title", type="string"),
+    *             @OA\Property(property="exhibition_poster", type="string", format="uri"),
+    *             @OA\Property(property="exhibition_category", type="string"),
+    *             @OA\Property(property="exhibition_start_date", type="string", format="date"),
+    *             @OA\Property(property="exhibition_end_date", type="string", format="date"),
+    *             @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
+    *             @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
+    *             @OA\Property(property="exhibition_location", type="string"),
+    *             @OA\Property(property="exhibition_price", type="integer"),
+    *             @OA\Property(property="gallery_id", type="integer"),
+    *             @OA\Property(property="exhibition_tag", type="string"),
+    *             @OA\Property(property="exhibition_status", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="내 전시 일정 없음")
+     * )
+     */
     public function getMyReservations() {
         $user = $this->auth->authenticate(); // JWT 검사
         $userId = $user->user_id;
@@ -65,6 +188,29 @@ class UserController {
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/users/me/purchases",
+     *     summary="내 구매 내역",
+     *     tags={"User"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="성공",
+     *         @OA\JsonContent(
+    *             @OA\Property(property="id", type="integer"),
+    *             @OA\Property(property="user_id", type="integer"),
+    *             @OA\Property(property="book_id", type="integer"),
+    *             @OA\Property(property="user_book_payment_method", type="string"),
+    *             @OA\Property(property="user_book_status", type="string"),
+    *             @OA\Property(property="create_dttm", type="string", format="date-time"),
+    *             @OA\Property(property="update_dttm", type="string", format="date-time"),
+    *             @OA\Property(property="book_title", type="string"),
+    *             @OA\Property(property="book_poster", type="string", format="uri")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="내 구매 내역 없음")
+     * )
+     */
     public function getMyPurchases() {
         $user = $this->auth->authenticate(); // JWT 검사
         $userId = $user->user_id;

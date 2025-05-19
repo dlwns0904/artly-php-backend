@@ -3,6 +3,12 @@ namespace Controllers;
 
 use Models\UserModel;
 use Firebase\JWT\JWT;
+/**
+ * @OA\Tag(
+ *     name="Auth",
+ *     description="로그인/회원가입 API"
+ * )
+ */
 
 class AuthController {
     private $model;
@@ -11,7 +17,47 @@ class AuthController {
     public function __construct() {
         $this->model = new UserModel();
     }
-    
+
+    /**
+     * @OA\Post(
+     *     path="/api/auth/login",
+     *     summary="로그인",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="login_id", type="string"),
+     *             @OA\Property(property="login_pwd", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="로그인 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="jwt", type="string"),
+     *             @OA\Property(property="data", type="object",
+        *             @OA\Property(property="id", type="integer"),
+        *             @OA\Property(property="login_id", type="string"),
+        *             @OA\Property(property="login_pwd", type="string"),
+        *             @OA\Property(property="user_name", type="string"),
+        *             @OA\Property(property="user_gender", type="string"),
+        *             @OA\Property(property="user_age", type="integer"),
+        *             @OA\Property(property="user_email", type="string"),
+        *             @OA\Property(property="user_phone", type="string"),
+        *             @OA\Property(property="user_img", type="string"),
+        *             @OA\Property(property="user_keyword", type="string"),
+        *             @OA\Property(property="admin_flag", type="integer"),
+        *             @OA\Property(property="gallery_id", type="integer"),
+        *             @OA\Property(property="last_login_time", type="string", format="date-time"),
+        *             @OA\Property(property="reg_time", type="string", format="date-time"),
+        *             @OA\Property(property="update_dttm", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="로그인 실패")
+     * )
+     */
     public function login() {
         $data = json_decode(file_get_contents('php://input'), true);
         $user = $this->model->getByLoginId($data['login_id']);
@@ -30,9 +76,66 @@ class AuthController {
             'data' => $user
         ], JSON_UNESCAPED_UNICODE);
     }
-    
+
+    /**
+     * @OA\Post(
+     *     path="/api/auth/login",
+     *     summary="로그인",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="login_id", type="string"),
+     *             @OA\Property(property="login_pwd", type="string"),
+     *             @OA\Property(property="user_name", type="string"),
+     *             @OA\Property(property="user_gender", type="string"),
+     *             @OA\Property(property="user_age", type="integer"),
+     *             @OA\Property(property="user_email", type="string"),
+     *             @OA\Property(property="user_phone", type="string"),
+     *             @OA\Property(property="user_img", type="string"),
+     *             @OA\Property(property="user_keyword", type="string"),
+     *             @OA\Property(property="admin_flag", type="integer"),
+     *             @OA\Property(property="gallery_id", type="integer"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="회원가입 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="jwt", type="string"),
+     *             @OA\Property(property="data", type="object",
+        *             @OA\Property(property="id", type="integer"),
+        *             @OA\Property(property="login_id", type="string"),
+        *             @OA\Property(property="login_pwd", type="string"),
+        *             @OA\Property(property="user_name", type="string"),
+        *             @OA\Property(property="user_gender", type="string"),
+        *             @OA\Property(property="user_age", type="integer"),
+        *             @OA\Property(property="user_email", type="string"),
+        *             @OA\Property(property="user_phone", type="string"),
+        *             @OA\Property(property="user_img", type="string"),
+        *             @OA\Property(property="user_keyword", type="string"),
+        *             @OA\Property(property="admin_flag", type="integer"),
+        *             @OA\Property(property="gallery_id", type="integer"),
+        *             @OA\Property(property="last_login_time", type="string", format="date-time"),
+        *             @OA\Property(property="reg_time", type="string", format="date-time"),
+        *             @OA\Property(property="update_dttm", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="회원가입 실패")
+     * )
+     */
     public function register() {
         $data = json_decode(file_get_contents('php://input'), true);
+
+        // 아이디 중복 검사
+        if ($this->model->getByLoginId($data['login_id'])) {
+            http_response_code(409); // Conflict
+            echo json_encode(['message' => '이미 존재하는 아이디입니다.'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
         $newUser = $this->model->create($data);
 
         if ($newUser) {
