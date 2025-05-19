@@ -50,5 +50,12 @@ class GalleryModel {
         $stmt->execute([':id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function getGalleriesBySearch($filters = []) {
+        $search = $filters['search'];
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_gallery WHERE gallery_name LIKE :search");
+        $stmt->execute([':search' => "%$search%"]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 

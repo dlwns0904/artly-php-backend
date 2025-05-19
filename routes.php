@@ -7,6 +7,9 @@ use Controllers\ExhibitionController;
 use Controllers\ArtController;
 use Controllers\GalleryController;
 use Controllers\AnnouncementController;
+use Controllers\UserController;
+use Controllers\AuthController;
+use Controllers\SearchController;
 
 $requestUri     = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $requestMethod  = $_SERVER['REQUEST_METHOD'];
@@ -72,6 +75,33 @@ elseif ($requestMethod === 'GET' && preg_match('#^/api/announcements/(\d+)$#', $
 }
 elseif ($requestMethod === 'GET' && preg_match('#^/api/announcements$#', $requestUri)) {
     (new AnnouncementController())->getAnnouncementList();
+}
+
+/* ───────────────────────── User ───────────────────────── */
+
+elseif ($requestMethod === 'POST' && $requestUri === '/api/auth/register') {
+    (new AuthController())->register();
+}
+elseif ($requestMethod === 'POST' && $requestUri === '/api/auth/login') {
+    (new AuthController())->login();
+}
+elseif ($requestMethod === 'PUT' && $requestUri === '/api/users/me') {
+    (new UserController())->updateMe();
+}
+elseif ($requestMethod === 'GET' && $requestUri === '/api/users/me') {
+    (new UserController())->getMe();
+}
+elseif ($requestMethod === 'GET' && $requestUri === '/api/users/me/exhibitions') {
+    (new UserController())->getMyReservations();
+}
+elseif ($requestMethod === 'GET' && $requestUri === '/api/users/me/purchases') {
+    (new UserController())->getMyPurchases();
+}
+
+/* ───────────────────────── Search ───────────────────────── */
+
+elseif ($requestMethod === 'GET' && preg_match('#^/api/search$#', $requestUri)) {
+    (new SearchController())->getResults();
 }
 
 /* ───────────────────────── 기본/404 ───────────────────────── */

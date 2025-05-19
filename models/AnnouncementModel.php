@@ -38,5 +38,12 @@ class AnnouncementModel {
         $stmt->execute([':id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function getAnnouncementsBySearch($filters = []) {
+        $search = $filters['search'];
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_announcement WHERE announcement_title LIKE :search");
+        $stmt->execute([':search' => "%$search%"]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 

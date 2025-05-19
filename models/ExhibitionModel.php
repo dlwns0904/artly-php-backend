@@ -105,5 +105,12 @@ class ExhibitionModel {
         $stmt = $this->pdo->prepare("DELETE FROM APIServer_exhibition WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }
+
+    public function getExhibitionsBySearch($filters = []) {
+        $search = $filters['search'];
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition WHERE exhibition_title LIKE :search");
+        $stmt->execute([':search' => "%$search%"]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 

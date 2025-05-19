@@ -46,5 +46,12 @@ class ArtistModel {
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function getArtistsBySearch($filters = []) {
+        $search = $filters['search'];
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_artist WHERE artist_name LIKE :search");
+        $stmt->execute([':search' => "%$search%"]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 
