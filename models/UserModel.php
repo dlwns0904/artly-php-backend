@@ -38,7 +38,7 @@ class UserModel {
              WHERE A.session_id = B.id AND B.exhibition_id = C.id
              AND A.user_id = ?");
         $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     # 사용자의 구매(도록) 정보 가져오기
@@ -49,7 +49,19 @@ class UserModel {
              WHERE A.book_id = B.id
              AND A.user_id = ?");
         $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    # 사용자의 좋아요한 전시회 정보 가져오기
+    public function getMyLikeExhibitions($userId) {
+        $stmt = $this->pdo->prepare(
+            "SELECT A.*
+             FROM APIServer_exhibition A, APIServer_like B
+             WHERE B.liked_type = 'exhibition' 
+             AND A.id = B.liked_id 
+             AND B.user_id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function create($data) {

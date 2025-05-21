@@ -98,6 +98,9 @@ elseif ($requestMethod === 'GET' && $requestUri === '/api/users/me/exhibitions')
 elseif ($requestMethod === 'GET' && $requestUri === '/api/users/me/purchases') {
     (new UserController())->getMyPurchases();
 }
+elseif ($requestMethod === 'GET' && $requestUri === '/api/users/me/likes') {
+    (new UserController())->getMyLikes();
+}
 
 /* ───────────────────────── Search ───────────────────────── */
 

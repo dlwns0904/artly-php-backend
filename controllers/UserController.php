@@ -143,34 +143,34 @@ class UserController {
      *     @OA\Response(
      *         response=200,
      *         description="성공",
-     *         @OA\JsonContent(
-    *             @OA\Property(property="id", type="integer"),
-    *             @OA\Property(property="user_id", type="integer"),
-    *             @OA\Property(property="session_id", type="integer"),
-    *             @OA\Property(property="reservation_datetime", type="string", format="date-time"),
-    *             @OA\Property(property="reservation_number_of_tickets", type="integer"),
-    *             @OA\Property(property="reservation_total_price", type="integer"),
-    *             @OA\Property(property="reservation_payment_method", type="string"),
-    *             @OA\Property(property="reservation_status", type="string"),
-    *             @OA\Property(property="create_dttm", type="string", format="date-time"),
-    *             @OA\Property(property="update_dttm", type="string", format="date-time"),
-    *             @OA\Property(property="exhibition_id", type="integer"),
-    *             @OA\Property(property="session_datetime", type="string", format="date-time"),
-    *             @OA\Property(property="session_total_capacity", type="integer"),
-    *             @OA\Property(property="session_reservation_capacity", type="integer"),
-    *             @OA\Property(property="exhibition_title", type="string"),
-    *             @OA\Property(property="exhibition_poster", type="string", format="uri"),
-    *             @OA\Property(property="exhibition_category", type="string"),
-    *             @OA\Property(property="exhibition_start_date", type="string", format="date"),
-    *             @OA\Property(property="exhibition_end_date", type="string", format="date"),
-    *             @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
-    *             @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
-    *             @OA\Property(property="exhibition_location", type="string"),
-    *             @OA\Property(property="exhibition_price", type="integer"),
-    *             @OA\Property(property="gallery_id", type="integer"),
-    *             @OA\Property(property="exhibition_tag", type="string"),
-    *             @OA\Property(property="exhibition_status", type="string")
-     *         )
+     *         @OA\JsonContent(type="array", @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="session_id", type="integer"),
+     *             @OA\Property(property="reservation_datetime", type="string", format="date-time"),
+     *             @OA\Property(property="reservation_number_of_tickets", type="integer"),
+     *             @OA\Property(property="reservation_total_price", type="integer"),
+     *             @OA\Property(property="reservation_payment_method", type="string"),
+     *             @OA\Property(property="reservation_status", type="string"),
+     *             @OA\Property(property="create_dttm", type="string", format="date-time"),
+     *             @OA\Property(property="update_dttm", type="string", format="date-time"),
+     *             @OA\Property(property="exhibition_id", type="integer"),
+     *             @OA\Property(property="session_datetime", type="string", format="date-time"),
+     *             @OA\Property(property="session_total_capacity", type="integer"),
+     *             @OA\Property(property="session_reservation_capacity", type="integer"),
+     *             @OA\Property(property="exhibition_title", type="string"),
+     *             @OA\Property(property="exhibition_poster", type="string", format="uri"),
+     *             @OA\Property(property="exhibition_category", type="string"),
+     *             @OA\Property(property="exhibition_start_date", type="string", format="date"),
+     *             @OA\Property(property="exhibition_end_date", type="string", format="date"),
+     *             @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
+     *             @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
+     *             @OA\Property(property="exhibition_location", type="string"),
+     *             @OA\Property(property="exhibition_price", type="integer"),
+     *             @OA\Property(property="gallery_id", type="integer"),
+     *             @OA\Property(property="exhibition_tag", type="string"),
+     *             @OA\Property(property="exhibition_status", type="string")
+     *         ))
      *     ),
      *     @OA\Response(response=404, description="내 전시 일정 없음")
      * )
@@ -196,17 +196,17 @@ class UserController {
      *     @OA\Response(
      *         response=200,
      *         description="성공",
-     *         @OA\JsonContent(
-    *             @OA\Property(property="id", type="integer"),
-    *             @OA\Property(property="user_id", type="integer"),
-    *             @OA\Property(property="book_id", type="integer"),
-    *             @OA\Property(property="user_book_payment_method", type="string"),
-    *             @OA\Property(property="user_book_status", type="string"),
-    *             @OA\Property(property="create_dttm", type="string", format="date-time"),
-    *             @OA\Property(property="update_dttm", type="string", format="date-time"),
-    *             @OA\Property(property="book_title", type="string"),
-    *             @OA\Property(property="book_poster", type="string", format="uri")
-     *         )
+     *         @OA\JsonContent(type="array", @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="book_id", type="integer"),
+     *             @OA\Property(property="user_book_payment_method", type="string"),
+     *             @OA\Property(property="user_book_status", type="string"),
+     *             @OA\Property(property="create_dttm", type="string", format="date-time"),
+     *             @OA\Property(property="update_dttm", type="string", format="date-time"),
+     *             @OA\Property(property="book_title", type="string"),
+     *             @OA\Property(property="book_poster", type="string", format="uri")
+     *         ))
      *     ),
      *     @OA\Response(response=404, description="내 구매 내역 없음")
      * )
@@ -221,6 +221,48 @@ class UserController {
         } else {
             http_response_code(404);
             echo json_encode(['message' => 'Purchases not found']);
+        }
+    }
+    
+    /**
+     * @OA\Get(
+     *     path="/api/users/me/likes",
+     *     summary="내 좋아요 전시회",
+     *     tags={"User"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="성공",
+     *         @OA\JsonContent(type="array", @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="exhibition_title", type="string"),
+     *             @OA\Property(property="exhibition_poster", type="string"),
+     *             @OA\Property(property="exhibition_category", type="string"),
+     *             @OA\Property(property="exhibition_start_date", type="date-time"),
+     *             @OA\Property(property="exhibition_end_date", type="date-time"),
+     *             @OA\Property(property="exhibition_start_time", type="date-time"),
+     *             @OA\Property(property="exhibition_end_time", type="date-time"),
+     *             @OA\Property(property="exhibition_location", type="string"),
+     *             @OA\Property(property="exhibition_price", type="integer"),
+     *             @OA\Property(property="gallery_id", type="integer"),
+     *             @OA\Property(property="exhibition_tag", type="string"),
+     *             @OA\Property(property="exhibition_status", type="string"),
+     *             @OA\Property(property="create_dttm", type="string", format="date-time"),
+     *             @OA\Property(property="update_dttm", type="string", format="date-time")
+     *         ))
+     *     ),
+     *     @OA\Response(response=404, description="내 좋아요 전시회 없음")
+     * )
+     */
+    public function getMyLikes() {
+        $user = $this->auth->authenticate(); // JWT 검사
+        $userId = $user->user_id;
+
+        $likeExhibitions = $this->model->getMyLikeExhibitions($userId);
+        if ($likeExhibitions) {
+            echo json_encode($likeExhibitions, JSON_UNESCAPED_UNICODE);
+        } else {
+            http_response_code(404);
+            echo json_encode(['message' => 'Like Exhibitions not found']);
         }
     }
 }

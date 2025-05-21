@@ -30,11 +30,13 @@ class LikeModel {
             "DELETE FROM APIServer_like 
              WHERE user_id = :user_id and liked_id = :liked_id and liked_type = :liked_type");
              
-        return $stmt->execute([
+        $stmt->execute([
             ':user_id' => $userId,
             ':liked_id' => $data['liked_id'],
             ':liked_type' => $data['liked_type']
         ]);
+
+        return $stmt->rowCount() > 0; // 삭제된 행이 있어야 true
     }
 
     public function targetExists($data) {
