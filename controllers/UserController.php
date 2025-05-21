@@ -43,7 +43,7 @@ class UserController {
      *             @OA\Property(property="gallery_id", type="integer"),
      *             @OA\Property(property="last_login_time", type="string", format="date-time"),
      *             @OA\Property(property="reg_time", type="string", format="date-time"),
-     *             @OA\Property(property="update_dttm", type="string", format="date-time")
+     *             @OA\Property(property="update_dtm", type="string", format="date-time")
      *         )
      *     ),
      *     @OA\Response(response=404, description="프로필 없음")
@@ -103,7 +103,7 @@ class UserController {
         *             @OA\Property(property="gallery_id", type="integer"),
         *             @OA\Property(property="last_login_time", type="string", format="date-time"),
         *             @OA\Property(property="reg_time", type="string", format="date-time"),
-        *             @OA\Property(property="update_dttm", type="string", format="date-time")
+        *             @OA\Property(property="update_dtm", type="string", format="date-time")
      *             )
      *         )
      *     ),
@@ -152,8 +152,8 @@ class UserController {
      *             @OA\Property(property="reservation_total_price", type="integer"),
      *             @OA\Property(property="reservation_payment_method", type="string"),
      *             @OA\Property(property="reservation_status", type="string"),
-     *             @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dttm", type="string", format="date-time"),
+     *             @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *             @OA\Property(property="update_dtm", type="string", format="date-time"),
      *             @OA\Property(property="exhibition_id", type="integer"),
      *             @OA\Property(property="session_datetime", type="string", format="date-time"),
      *             @OA\Property(property="session_total_capacity", type="integer"),
@@ -202,8 +202,8 @@ class UserController {
      *             @OA\Property(property="book_id", type="integer"),
      *             @OA\Property(property="user_book_payment_method", type="string"),
      *             @OA\Property(property="user_book_status", type="string"),
-     *             @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dttm", type="string", format="date-time"),
+     *             @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *             @OA\Property(property="update_dtm", type="string", format="date-time"),
      *             @OA\Property(property="book_title", type="string"),
      *             @OA\Property(property="book_poster", type="string", format="uri")
      *         ))
@@ -246,8 +246,8 @@ class UserController {
      *             @OA\Property(property="gallery_id", type="integer"),
      *             @OA\Property(property="exhibition_tag", type="string"),
      *             @OA\Property(property="exhibition_status", type="string"),
-     *             @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dttm", type="string", format="date-time")
+     *             @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *             @OA\Property(property="update_dtm", type="string", format="date-time")
      *         ))
      *     ),
      *     @OA\Response(response=404, description="내 좋아요 전시회 없음")

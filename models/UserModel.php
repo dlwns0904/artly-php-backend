@@ -66,7 +66,7 @@ class UserModel {
 
     public function create($data) {
         $stmt = $this->pdo->prepare("INSERT INTO APIServer_user 
-            (login_id, login_pwd, user_name, user_gender, user_age, user_email, user_phone, user_img, user_keyword, admin_flag, gallery_id, last_login_time, reg_time, update_dttm)
+            (login_id, login_pwd, user_name, user_gender, user_age, user_email, user_phone, user_img, user_keyword, admin_flag, gallery_id, last_login_time, reg_time, update_dtm)
             VALUES (:userId, :password, :name, :gender, :age, :email, :phone, :img, :keyword, :admin_flag, :gallery_id, NOW(), NOW(), NOW())
         ");
 
@@ -105,7 +105,7 @@ class UserModel {
             user_keyword = :keyword,
             admin_flag = :admin_flag,
             gallery_id = :gallery_id,
-            update_dttm = NOW()
+            update_dtm = NOW()
             WHERE id = :id
         ");
 

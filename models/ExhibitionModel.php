@@ -41,7 +41,7 @@ class ExhibitionModel {
 
     public function create($data) {
         $stmt = $this->pdo->prepare("INSERT INTO APIServer_exhibition
-            (exhibition_title, exhibition_poster, exhibition_category, exhibition_start_date, exhibition_end_date, exhibition_start_time, exhibition_end_time, exhibition_location, exhibition_price, gallery_id, exhibition_tag, exhibition_status, create_dttm, update_dttm)
+            (exhibition_title, exhibition_poster, exhibition_category, exhibition_start_date, exhibition_end_date, exhibition_start_time, exhibition_end_time, exhibition_location, exhibition_price, gallery_id, exhibition_tag, exhibition_status, create_dtm, update_dtm)
             VALUES (:title, :poster, :category, :start_date, :end_date, :start_time, :end_time, :location, :price, :gallery_id, :tag, :status, NOW(), NOW())");
 
         $stmt->execute([
@@ -81,7 +81,7 @@ class ExhibitionModel {
             gallery_id = :gallery_id,
             exhibition_tag = :tag,
             exhibition_status = :status,
-            update_dttm = NOW()
+            update_dtm = NOW()
             WHERE id = :id");
 
         return $stmt->execute([

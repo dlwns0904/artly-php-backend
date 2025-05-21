@@ -55,8 +55,8 @@ class SearchController {
      *                     @OA\Property(property="gallery_id", type="integer"),
      *                     @OA\Property(property="exhibition_tag", type="string"),
      *                     @OA\Property(property="exhibition_status", type="string"),
-     *                     @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *                     @OA\Property(property="update_dttm", type="string", format="date-time")
+     *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *                     @OA\Property(property="update_dtm", type="string", format="date-time")
      *                 )
      *             ),
      *             @OA\Property(
@@ -72,8 +72,8 @@ class SearchController {
      *                     @OA\Property(property="gallery_closed_day", type="string", format="date-time"),
      *                     @OA\Property(property="gallery_category", type="string"),
      *                     @OA\Property(property="gallery_description", type="string"),
-     *                     @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *                     @OA\Property(property="update_dttm", type="string", format="date-time")
+     *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *                     @OA\Property(property="update_dtm", type="string", format="date-time")
      *                 )
      *             ),
      *             @OA\Property(
@@ -86,8 +86,8 @@ class SearchController {
      *                     @OA\Property(property="artist_category", type="string"),
      *                     @OA\Property(property="artist_nation", type="string"),
      *                     @OA\Property(property="artist_description", type="string"),
-     *                     @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *                     @OA\Property(property="update_dttm", type="string", format="date-time")
+     *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *                     @OA\Property(property="update_dtm", type="string", format="date-time")
      *                 )
      *             ),
      *             @OA\Property(
@@ -106,8 +106,8 @@ class SearchController {
      *                     @OA\Property(property="announcement_site_url", type="string"),
      *                     @OA\Property(property="announcement_attachment_url", type="string"),
      *                     @OA\Property(property="content", type="string"),
-     *                     @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *                     @OA\Property(property="update_dttm", type="string", format="date-time")
+     *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *                     @OA\Property(property="update_dtm", type="string", format="date-time")
      *                 )
      *             )
      *         )

@@ -32,8 +32,8 @@ class ExhibitionController {
      *             @OA\Property(property="exhibition_title", type="string"),
      *             @OA\Property(property="exhibition_category", type="string"),
      *             @OA\Property(property="exhibition_status", type="string"),
-     *             @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dttm", type="string", format="date-time")
+     *             @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *             @OA\Property(property="update_dtm", type="string", format="date-time")
      *         ))
      *     )
      * )
@@ -63,8 +63,8 @@ class ExhibitionController {
      *             @OA\Property(property="exhibition_title", type="string"),
      *             @OA\Property(property="exhibition_category", type="string"),
      *             @OA\Property(property="exhibition_status", type="string"),
-     *             @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dttm", type="string", format="date-time")
+     *             @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *             @OA\Property(property="update_dtm", type="string", format="date-time")
      *         )
      *     ),
      *     @OA\Response(response=404, description="전시회 없음")
@@ -104,8 +104,8 @@ class ExhibitionController {
      *                 @OA\Property(property="exhibition_title", type="string"),
      *                 @OA\Property(property="exhibition_category", type="string"),
      *                 @OA\Property(property="exhibition_status", type="string"),
-     *                 @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *                 @OA\Property(property="update_dttm", type="string", format="date-time")
+     *                 @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *                 @OA\Property(property="update_dtm", type="string", format="date-time")
      *             )
      *         )
      *     )
@@ -151,8 +151,8 @@ class ExhibitionController {
      *                 @OA\Property(property="exhibition_title", type="string"),
      *                 @OA\Property(property="exhibition_category", type="string"),
      *                 @OA\Property(property="exhibition_status", type="string"),
-     *                 @OA\Property(property="create_dttm", type="string", format="date-time"),
-     *                 @OA\Property(property="update_dttm", type="string", format="date-time")
+     *                 @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *                 @OA\Property(property="update_dtm", type="string", format="date-time")
      *             )
      *         )
      *     ),

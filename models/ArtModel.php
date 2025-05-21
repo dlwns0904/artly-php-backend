@@ -27,7 +27,7 @@ class ArtModel {
 
     public function create($data) {
         $stmt = $this->pdo->prepare("INSERT INTO APIServer_art 
-            (art_image, artist_id, art_title, art_description, art_docent, create_dttm, update_dttm)
+            (art_image, artist_id, art_title, art_description, art_docent, create_dtm, update_dtm)
             VALUES (:image, :artist_id, :title, :description, :docent, NOW(), NOW())");
 
         $stmt->execute([
@@ -53,7 +53,7 @@ class ArtModel {
             art_title = :title,
             art_description = :description,
             art_docent = :docent,
-            update_dttm = NOW()
+            update_dtm = NOW()
             WHERE id = :id");
 
         return $stmt->execute([

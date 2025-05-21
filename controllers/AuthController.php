@@ -51,7 +51,7 @@ class AuthController {
         *             @OA\Property(property="gallery_id", type="integer"),
         *             @OA\Property(property="last_login_time", type="string", format="date-time"),
         *             @OA\Property(property="reg_time", type="string", format="date-time"),
-        *             @OA\Property(property="update_dttm", type="string", format="date-time")
+        *             @OA\Property(property="update_dtm", type="string", format="date-time")
      *             )
      *         )
      *     ),
@@ -119,7 +119,7 @@ class AuthController {
         *             @OA\Property(property="gallery_id", type="integer"),
         *             @OA\Property(property="last_login_time", type="string", format="date-time"),
         *             @OA\Property(property="reg_time", type="string", format="date-time"),
-        *             @OA\Property(property="update_dttm", type="string", format="date-time")
+        *             @OA\Property(property="update_dtm", type="string", format="date-time")
      *             )
      *         )
      *     ),
