@@ -10,6 +10,7 @@ use Controllers\AnnouncementController;
 use Controllers\UserController;
 use Controllers\AuthController;
 use Controllers\SearchController;
+use Controllers\LikeController;
 
 $requestUri     = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $requestMethod  = $_SERVER['REQUEST_METHOD'];
@@ -102,6 +103,15 @@ elseif ($requestMethod === 'GET' && $requestUri === '/api/users/me/purchases') {
 
 elseif ($requestMethod === 'GET' && preg_match('#^/api/search$#', $requestUri)) {
     (new SearchController())->getResults();
+}
+
+/* ───────────────────────── Like ───────────────────────── */
+
+elseif ($requestMethod === 'POST' && $requestUri === '/api/likes') {
+    (new LikeController())->createLike();
+}
+elseif ($requestMethod === 'DELETE' && $requestUri === '/api/likes') {
+    (new LikeController())->deleteLike();
 }
 
 /* ───────────────────────── 기본/404 ───────────────────────── */
