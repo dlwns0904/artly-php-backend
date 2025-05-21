@@ -180,6 +180,16 @@ $tables = [
         book_page_description TEXT,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
         update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+
+    // APIServer_like
+    "CREATE TABLE IF NOT EXISTS APIServer_like (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        liked_id INT NOT NULL, # 좋아요 대상의 아이디
+        liked_type ENUM('gallery', 'exhibition', 'artist') NOT NULL,
+        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
 ];
 
