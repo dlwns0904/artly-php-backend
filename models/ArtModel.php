@@ -71,3 +71,4 @@ class ArtModel {
         return $stmt->execute(['id' => $id]);
     }
 }
+

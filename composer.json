@@ -1,16 +1,17 @@
 {
   "require": {
     "zircote/swagger-php": "^4.11",
-    "doctrine/annotations": "^1.14"
+    "doctrine/annotations": "^1.14",
+    "firebase/php-jwt": "^6.4"
   },
   "autoload": {
     "psr-4": {
       "Controllers\\": "controllers/",
-      "Models\\": "models/"
+      "Models\\": "models/",
+      "Middlewares\\": "middlewares/"
     },
     "classmap": [
       "openapi.php"
     ]
   }
 }
-

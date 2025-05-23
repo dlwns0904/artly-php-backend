@@ -2,13 +2,20 @@
 namespace Controllers;
 
 use OpenApi\Annotations as OA;
-
 use Models\ArtistModel;
 
-
+/**
+ * @OA\Tag(
+ *     name="Artist",
+ *     description="작가 관련 API"
+ * )
+ */
 class ArtistController {
     private $model;
-    public function __construct() { $this->model = new ArtistModel(); }
+
+    public function __construct() {
+        $this->model = new ArtistModel();
+    }
 
     /**
      * @OA\Get(
@@ -24,7 +31,6 @@ class ArtistController {
      *     @OA\JsonContent(type="array", @OA\Items(
      *       @OA\Property(property="id",    type="integer", example=1),
      *       @OA\Property(property="name",  type="string",  example="김길동"),
-     *       @OA\Property(property="img",   type="string",  example="image.url"), 	
      *       @OA\Property(property="field", type="string",  example="회화")
      *     ))
      *   )
@@ -47,9 +53,14 @@ class ArtistController {
      *       @OA\Schema(type="integer", example=1)),
      *   @OA\Response(
      *       response=200, description="성공",
-     *       @OA\JsonContent(@OA\Property(property="id",   type="integer"),
-     *                        @OA\Property(property="name", type="string"),
-     *                        @OA\Property(property="field",type="string"))
+     *       @OA\JsonContent(
+     *           @OA\Property(property="id", type="integer"),
+     *           @OA\Property(property="name", type="string"),
+     *           @OA\Property(property="field", type="string"),
+     *           @OA\Property(property="imageUrl", type="string"),
+     *           @OA\Property(property="nation", type="string"),
+     *           @OA\Property(property="description", type="string")
+     *       )
      *   ),
      *   @OA\Response(response=404, description="Not Found")
      * )
@@ -63,6 +74,72 @@ class ArtistController {
             http_response_code(404);
             echo json_encode(['message' => 'Artist not found']);
         }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/artists",
+     *     summary="작가 생성",
+     *     tags={"Artist"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="artist_name", type="string"),
+     *             @OA\Property(property="artist_category", type="string"),
+     *             @OA\Property(property="artist_image", type="string"),
+     *             @OA\Property(property="artist_nation", type="string"),
+     *             @OA\Property(property="artist_description", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="작가 생성 완료")
+     * )
+     */
+    public function createArtist() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $created = $this->model->create($data);
+        http_response_code(201);
+        echo json_encode($created, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/api/artists/{id}",
+     *     summary="작가 수정",
+     *     tags={"Artist"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="artist_name", type="string"),
+     *             @OA\Property(property="artist_category", type="string"),
+     *             @OA\Property(property="artist_image", type="string"),
+     *             @OA\Property(property="artist_nation", type="string"),
+     *             @OA\Property(property="artist_description", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="작가 수정 완료")
+     * )
+     */
+    public function updateArtist($id) {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $updated = $this->model->update($id, $data);
+        http_response_code(200);
+        echo json_encode($updated, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/artists/{id}",
+     *     summary="작가 삭제",
+     *     tags={"Artist"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="작가 삭제 완료")
+     * )
+     */
+    public function deleteArtist($id) {
+        $this->model->delete($id);
+        http_response_code(200);
+        echo json_encode(['message' => 'Artist deleted'], JSON_UNESCAPED_UNICODE);
     }
 }
 

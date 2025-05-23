@@ -12,8 +12,64 @@ class GalleryModel {
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
+    public function create($data) {
+        $sql = "INSERT INTO APIServer_gallery (
+            gallery_name, gallery_image, gallery_address, gallery_start_time,
+            gallery_end_time, gallery_closed_day, gallery_category, gallery_description
+        ) VALUES (
+            :name, :image, :address, :start_time,
+            :end_time, :closed_day, :category, :description
+        )";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':name' => $data['gallery_name'],
+            ':image' => $data['gallery_image'],
+            ':address' => $data['gallery_address'],
+            ':start_time' => $data['gallery_start_time'],
+            ':end_time' => $data['gallery_end_time'],
+            ':closed_day' => $data['gallery_closed_day'],
+            ':category' => $data['gallery_category'],
+            ':description' => $data['gallery_description']
+        ]);
+
+        $id = $this->pdo->lastInsertId();
+        return $this->getById($id);
+    }
+
+    public function update($id, $data) {
+        $sql = "UPDATE APIServer_gallery SET
+            gallery_name = :name,
+            gallery_image = :image,
+            gallery_address = :address,
+            gallery_start_time = :start_time,
+            gallery_end_time = :end_time,
+            gallery_closed_day = :closed_day,
+            gallery_category = :category,
+            gallery_description = :description
+        WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':id' => $id,
+            ':name' => $data['gallery_name'],
+            ':image' => $data['gallery_image'],
+            ':address' => $data['gallery_address'],
+            ':start_time' => $data['gallery_start_time'],
+            ':end_time' => $data['gallery_end_time'],
+            ':closed_day' => $data['gallery_closed_day'],
+            ':category' => $data['gallery_category'],
+            ':description' => $data['gallery_description']
+        ]);
+
+        return $this->getById($id);
+    }
+
+    public function delete($id) {
+        $stmt = $this->pdo->prepare("DELETE FROM APIServer_gallery WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+    }
+
     public function getGalleries($filters = []) {
-        $sql = "SELECT id, gallery_name AS name, gallery_image AS image FROM APIServer_gallery WHERE 1=1";
+        $sql = "SELECT id, gallery_name AS name, gallery_image AS image, gallery_category AS catecory FROM APIServer_gallery WHERE 1=1";
         $params = [];
 
         if (!empty($filters['status'])) {
@@ -41,36 +97,21 @@ class GalleryModel {
     }
 
     public function getById($id) {
-    // 갤러리 상세 정보
-    $stmt = $this->pdo->prepare("
-        SELECT id, gallery_name, gallery_image, gallery_address, gallery_start_time,
-               gallery_end_time, gallery_closed_day, gallery_category, gallery_description
-        FROM APIServer_gallery
-        WHERE id = :id
-    ");
-    $stmt->execute([':id' => $id]);
-    $gallery = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$gallery) {
-        return null;
+        $stmt = $this->pdo->prepare("
+            SELECT id, gallery_name, gallery_image, gallery_address, gallery_start_time,
+                   gallery_end_time, gallery_closed_day, gallery_category, gallery_description
+            FROM APIServer_gallery
+            WHERE id = :id
+        ");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // + 해당 갤러리의 전시 중인 전시들
-    $stmt2 = $this->pdo->prepare("
-        SELECT id, exhibition_title, exhibition_poster, exhibition_start_date, exhibition_end_date
-        FROM APIServer_exhibition
-        WHERE gallery_id = :id AND exhibition_status = 'exhibited'
-    ");
-    $stmt2->execute([':id' => $id]);
-    $exhibitions = $stmt2->fetchAll(PDO::FETCH_ASSOC);
-
-    // 결과에 +
-    $gallery['exhibitions'] = $exhibitions;
-
-    // 반환
-    return $gallery;
-}
-
-
+    public function getGalleriesBySearch($filters = []) {
+        $search = $filters['search'];
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_gallery WHERE gallery_name LIKE :search");
+        $stmt->execute([':search' => "%$search%"]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 
