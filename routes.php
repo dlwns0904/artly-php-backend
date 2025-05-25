@@ -11,10 +11,17 @@ use Controllers\UserController;
 use Controllers\AuthController;
 use Controllers\SearchController;
 use Controllers\LikeController;
+use Controllers\SessionController;
 
-$requestUri     = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$requestUri = str_replace('/artly-backend', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+
+
 $requestMethod  = $_SERVER['REQUEST_METHOD'];
+echo "<pre>Trying to call Controllers\\SessionController</pre>";
+var_dump(class_exists('Controllers\\SessionController')); // true면 OK
 
+#echo "<pre>requestUri: $requestUri\n";
+#echo "requestMethod: $requestMethod</pre>";
 /* ───────────────────────── Artist ───────────────────────── */
 
 if ($requestMethod === 'GET' && preg_match('#^/api/artists/(\d+)$#', $requestUri, $m)) {
@@ -101,11 +108,15 @@ elseif ($requestMethod === 'GET' && $requestUri === '/api/users/me/purchases') {
 elseif ($requestMethod === 'GET' && $requestUri === '/api/users/me/likes') {
     (new UserController())->getMyLikes();
 }
-
 /* ───────────────────────── Search ───────────────────────── */
 
-elseif ($requestMethod === 'GET' && preg_match('#^/api/search$#', $requestUri)) {
+elseif ($requestMethod === 'GET' && $requestUri === '/api/search') {
     (new SearchController())->getResults();
+}
+
+/* ───────────────────────── Session ───────────────────────── */
+elseif ($requestMethod === 'GET' && preg_match('#^/api/exhibitions/(\d+)/sessions$#', $requestUri, $m)) {
+    (new \Controllers\SessionController())->getSessionsByDate($m[1]);
 }
 
 /* ───────────────────────── Like ───────────────────────── */
