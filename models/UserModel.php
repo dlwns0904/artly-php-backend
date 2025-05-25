@@ -33,7 +33,9 @@ class UserModel {
     # 사용자의 예매 정보 가져오기
     public function getMyReservations($id) {
         $stmt = $this->pdo->prepare(
-            "SELECT *
+            "SELECT A.*, B.session_datetime, B.session_total_capacity, B.session_reservation_capacity, 
+                    C.exhibition_title, C.exhibition_poster, C.exhibition_category, C.exhibition_start_date, C.exhibition_end_date, C.exhibition_start_time, C.exhibition_end_time,
+                    C.exhibition_location, C.exhibition_price, C.gallery_id, C.exhibition_tag, C.exhibition_status
              FROM APIServer_reservation A, APIServer_session B, APIServer_exhibition C
              WHERE A.session_id = B.id AND B.exhibition_id = C.id
              AND A.user_id = ?");
