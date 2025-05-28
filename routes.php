@@ -12,6 +12,7 @@ use Controllers\AuthController;
 use Controllers\SearchController;
 use Controllers\LikeController;
 use Controllers\SessionController;
+use Controllers\BookController;
 
 $requestUri = str_replace('/artly-backend', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
@@ -126,6 +127,21 @@ elseif ($requestMethod === 'POST' && $requestUri === '/api/likes') {
 }
 elseif ($requestMethod === 'DELETE' && $requestUri === '/api/likes') {
     (new LikeController())->deleteLike();
+}
+
+/* ───────────────────────── Book ───────────────────────── */
+
+elseif ($requestMethod === 'GET' && preg_match('#^/api/books/(\d+)$#', $requestUri, $m)) {
+    (new BookController())->getBookById($m[1]);
+}
+elseif ($requestMethod === 'POST' && $requestUri === '/api/books') {
+    (new BookController())->createBook();
+}
+elseif ($requestMethod === 'PUT' && preg_match('#^/api/books/(\d+)$#', $requestUri, $m)) {
+    (new BookController())->updateBook($m[1]);
+}
+elseif ($requestMethod === 'DELETE' && preg_match('#^/api/books/(\d+)$#', $requestUri, $m)) {
+    (new BookController())->deleteBook($m[1]);
 }
 
 /* ───────────────────────── 기본/404 ───────────────────────── */
