@@ -8,8 +8,7 @@ class ChatModel {
     private $pdo;
 
     public function __construct() {
-        $config = require __DIR__ . '/../config/config.php';
-        $this->pdo = new PDO($config['dsn'], $config['user'], $config['password']);
+        $this->pdo = new PDO($_ENV['dsn'], $_ENV['user'], $_ENV['password']);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 

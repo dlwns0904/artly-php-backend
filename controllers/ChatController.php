@@ -10,12 +10,11 @@ class ChatController {
     private $model;
 
     public function __construct() {
-        $config = require __DIR__ . '/../config/config.php';
         $this->model = new ChatModel();
         $this->auth = new AuthMiddleware();
         $this->gpt_model_extraction = 'gpt-4.1-mini';
         $this->gpt_model_response = 'gpt-4.1-nano';
-        $this->api_key = $config['openaiApiKey'];
+        $this->api_key = $_ENV['openaiApiKey'];
         $this->systemPrompt = "당신은 사용자의 질문에 답을 하기 위해 제작된, Artly 앱의 안내 챗봇 Artlas입니다.";
     }
     
