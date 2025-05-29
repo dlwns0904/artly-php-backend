@@ -13,103 +13,221 @@ class ChatModel {
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    # 전시회 목록
-    public function getExhibitions($filters = []) {
-        $sql = "SELECT * FROM APIServer_exhibition WHERE 1=1";
-        $params = [];
-
-        if (!empty($filters['status'])) {
-            $sql .= " AND exhibition_status = :status";
-            $params[':status'] = $filters['status'];
-        }
-
-        if (!empty($filters['category'])) {
-            $sql .= " AND exhibition_category = :category";
-            $params[':category'] = $filters['category'];
-        }
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
+    # 채팅 목록
+    public function getConversations($userId) {
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_conversation WHERE user_id = :user_id");
+        $stmt->execute(['user_id' => $userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getById($id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function create($data) {
-        $stmt = $this->pdo->prepare("INSERT INTO APIServer_exhibition
-            (exhibition_title, exhibition_poster, exhibition_category, exhibition_start_date, exhibition_end_date, exhibition_start_time, exhibition_end_time, exhibition_location, exhibition_price, gallery_id, exhibition_tag, exhibition_status, create_dtm, update_dtm)
-            VALUES (:title, :poster, :category, :start_date, :end_date, :start_time, :end_time, :location, :price, :gallery_id, :tag, :status, NOW(), NOW())");
+    # 채팅 생성
+    public function addConversations($userId, $role, $content) {
+        $stmt = $this->pdo->prepare("INSERT INTO APIServer_conversation
+            (user_id, role, content, create_dtm, update_dtm)
+            VALUES (:user_id, :role, :content, NOW(), NOW())");
 
         $stmt->execute([
-            ':title' => $data['exhibition_title'],
-            ':poster' => $data['exhibition_poster'],
-            ':category' => $data['exhibition_category'],
-            ':start_date' => $data['exhibition_start_date'],
-            ':end_date' => $data['exhibition_end_date'],
-            ':start_time' => $data['exhibition_start_time'],
-            ':end_time' => $data['exhibition_end_time'],
-            ':location' => $data['exhibition_location'],
-            ':price' => $data['exhibition_price'],
-            ':gallery_id' => $data['gallery_id'],
-            ':tag' => $data['exhibition_tag'],
-            ':status' => $data['exhibition_status']
+            ':user_id' => $userId,
+            ':role' => $role,
+            ':content' => $content
         ]);
 
         // 생성된 데이터의 ID 가져오기
         $id = $this->pdo->lastInsertId();
 
-        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition WHERE id = :id");
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_conversation WHERE id = :id");
         $stmt->execute([':id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function update($id, $data) {
-        $stmt = $this->pdo->prepare("UPDATE APIServer_exhibition SET
-            exhibition_title = :title,
-            exhibition_poster = :poster,
-            exhibition_category = :category,
-            exhibition_start_date = :start_date,
-            exhibition_end_date = :end_date,
-            exhibition_start_time = :start_time,
-            exhibition_end_time = :end_time,
-            exhibition_location = :location,
-            exhibition_price = :price,
-            gallery_id = :gallery_id,
-            exhibition_tag = :tag,
-            exhibition_status = :status,
-            update_dtm = NOW()
-            WHERE id = :id");
+    public function getExhibitions($filters = []) {
+        $sql = "SELECT * FROM APIServer_exhibition WHERE 1=1";
+        $params = [];
 
-        return $stmt->execute([
-            ':title' => $data['exhibition_title'],
-            ':poster' => $data['exhibition_poster'],
-            ':category' => $data['exhibition_category'],
-            ':start_date' => $data['exhibition_start_date'],
-            ':end_date' => $data['exhibition_end_date'],
-            ':start_time' => $data['exhibition_start_time'],
-            ':end_time' => $data['exhibition_end_time'],
-            ':location' => $data['exhibition_location'],
-            ':price' => $data['exhibition_price'],
-            ':gallery_id' => $data['gallery_id'],
-            ':tag' => $data['exhibition_tag'],
-            ':status' => $data['exhibition_status'],
-            ':id' => $id
-        ]);
+        if (!empty($filters['title'])) {
+            $keywords = preg_split('/\s+/', trim($filters['title']));
+            $titleParts = [];
+            foreach ($keywords as $index => $word) {
+                $placeholder = ":title_keyword_$index";
+                $titleParts[] = "exhibition_title LIKE $placeholder";
+                $params[$placeholder] = '%' . $word . '%';
+            }
+            if (!empty($titleParts)) {
+                $sql .= " AND (" . implode(" OR ", $titleParts) . ")";
+            }
+        }
+        // location
+        if (!empty($filters['location'])) {
+            $sql .= " AND exhibition_location LIKE :location";
+            $params[':location'] = '%' . $filters['location'] . '%';
+        }
+        // price
+        if (!empty($filters['price'])) {
+            $sql .= " AND exhibition_price <= :price";
+            $params[':price'] = $filters['price'];
+        }
+        // category
+        if (!empty($filters['category'])) {
+            $sql .= " AND exhibition_category LIKE :category";
+            $params[':category'] = '%' . $filters['category'] . '%';
+        }
+        // date range
+        if (!empty($filters['date_range']) && count($filters['date_range']) === 2) {
+            $sql .= " AND exhibition_start_date <= :end_date AND exhibition_end_date >= :start_date";
+            $params[':start_date'] = $filters['date_range'][0];
+            $params[':end_date'] = $filters['date_range'][1];
+        }
+        // time range
+        if (!empty($filters['time_range']) && count($filters['time_range']) === 2) {
+            $sql .= " AND exhibition_start_time <= :end_time AND exhibition_end_time >= :start_time";
+            $params[':start_time'] = $filters['time_range'][0];
+            $params[':end_time'] = $filters['time_range'][1];
+        }
+        // tag (키워드 검색 - LIKE OR 조합)
+        if (!empty($filters['tag'])) {
+            $keywords = preg_split('/\s+/', trim($filters['tag']));
+            $tagParts = [];
+            foreach ($keywords as $index => $word) {
+                $placeholder = ":tag_keyword_$index";
+                $tagParts[] = "exhibition_tag LIKE $placeholder";
+                $params[$placeholder] = '%' . $word . '%';
+            }
+            if (!empty($tagParts)) {
+                $sql .= " AND (" . implode(" OR ", $tagParts) . ")";
+            }
+        }
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function delete($id) {
-        $stmt = $this->pdo->prepare("DELETE FROM APIServer_exhibition WHERE id = :id");
-        return $stmt->execute(['id' => $id]);
+    public function getArtists($filters = []) {
+        $sql = "SELECT * FROM APIServer_artist WHERE 1=1";
+        $params = [];
+
+        // name
+        if (!empty($filters['name'])) {
+            $sql .= " AND artist_name LIKE :name";
+            $params[':name'] = '%' . $filters['name'] . '%';
+        }
+        // category
+        if (!empty($filters['category'])) {
+            $sql .= " AND artist_category LIKE :category";
+            $params[':category'] = '%' . $filters['category'] . '%';
+        }
+        // nation
+        if (!empty($filters['nation'])) {
+            $sql .= " AND artist_nation LIKE :nation";
+            $params[':nation'] = '%' . $filters['nation'] . '%';
+        }
+        // description
+        if (!empty($filters['description'])) {
+            $keywords = preg_split('/\s+/', trim($filters['description']));
+            $tagParts = [];
+            foreach ($keywords as $index => $word) {
+                $placeholder = ":description_keyword_$index";
+                $tagParts[] = "artist_description LIKE $placeholder";
+                $params[$placeholder] = '%' . $word . '%';
+            }
+            if (!empty($tagParts)) {
+                $sql .= " AND (" . implode(" OR ", $tagParts) . ")";
+            }
+        }
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getExhibitionsBySearch($filters = []) {
-        $search = $filters['search'];
-        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition WHERE exhibition_title LIKE :search");
-        $stmt->execute([':search' => "%$search%"]);
+    public function getGalleries($filters = []) {
+        $sql = "SELECT * FROM APIServer_gallery WHERE 1=1";
+        $params = [];
+
+        // name
+        if (!empty($filters['name'])) {
+            $keywords = preg_split('/\s+/', trim($filters['name']));
+            $tagParts = [];
+            foreach ($keywords as $index => $word) {
+                $placeholder = ":gallery_name_keyword_$index";
+                $tagParts[] = "gallery_name LIKE $placeholder";
+                $params[$placeholder] = '%' . $word . '%';
+            }
+            if (!empty($tagParts)) {
+                $sql .= " AND (" . implode(" OR ", $tagParts) . ")";
+            }
+        }
+        // location
+        if (!empty($filters['location'])) {
+            $sql .= " AND gallery_address LIKE :location";
+            $params[':location'] = '%' . $filters['location'] . '%';
+        }
+        // time range
+        if (!empty($filters['time_range']) && count($filters['time_range']) === 2) {
+            $sql .= " AND gallery_start_time <= :end_time AND gallery_end_time >= :start_time";
+            $params[':start_time'] = $filters['time_range'][0];
+            $params[':end_time'] = $filters['time_range'][1];
+        }
+        // category
+        if (!empty($filters['category'])) {
+            $sql .= " AND gallery_category LIKE :category";
+            $params[':category'] = '%' . $filters['category'] . '%';
+        }
+        // description
+        if (!empty($filters['description'])) {
+            $keywords = preg_split('/\s+/', trim($filters['description']));
+            $tagParts = [];
+            foreach ($keywords as $index => $word) {
+                $placeholder = ":description_keyword_$index";
+                $tagParts[] = "gallery_description LIKE $placeholder";
+                $params[$placeholder] = '%' . $word . '%';
+            }
+            if (!empty($tagParts)) {
+                $sql .= " AND (" . implode(" OR ", $tagParts) . ")";
+            }
+        }
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAnnouncements($filters = []) {
+        $sql = "SELECT * FROM APIServer_announcement WHERE 1=1";
+        $params = [];
+
+        // title
+        if (!empty($filters['title'])) {
+            $keywords = preg_split('/\s+/', trim($filters['title']));
+            $tagParts = [];
+            foreach ($keywords as $index => $word) {
+                $placeholder = ":title_keyword_$index";
+                $tagParts[] = "announcement_title LIKE $placeholder";
+                $params[$placeholder] = '%' . $word . '%';
+            }
+            if (!empty($tagParts)) {
+                $sql .= " AND (" . implode(" OR ", $tagParts) . ")";
+            }
+        }
+        // date range
+        if (!empty($filters['date_range']) && count($filters['date_range']) === 2) {
+            $sql .= " AND announcement_start_datetime <= :end_date AND announcement_end_datetime >= :start_date";
+            $params[':start_date'] = $filters['date_range'][0];
+            $params[':end_date'] = $filters['date_range'][1];
+        }
+        // description
+        if (!empty($filters['content'])) {
+            $keywords = preg_split('/\s+/', trim($filters['content']));
+            $tagParts = [];
+            foreach ($keywords as $index => $word) {
+                $placeholder = ":content_keyword_$index";
+                $tagParts[] = "content LIKE $placeholder";
+                $params[$placeholder] = '%' . $word . '%';
+            }
+            if (!empty($tagParts)) {
+                $sql .= " AND (" . implode(" OR ", $tagParts) . ")";
+            }
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

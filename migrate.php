@@ -207,6 +207,16 @@ $tables = [
         artist_id INT NOT NULL,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
         update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+
+    // APIServer_conversation
+    "CREATE TABLE IF NOT EXISTS APIServer_conversation (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        role ENUM('user', 'assistant') NOT NULL,
+        content TEXT NOT NULL,
+        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
 ];
 
