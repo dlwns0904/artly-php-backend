@@ -13,6 +13,7 @@ use Controllers\SearchController;
 use Controllers\LikeController;
 use Controllers\SessionController;
 use Controllers\BookController;
+use Controllers\ChatController;
 
 $requestUri = str_replace('/artly-backend', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
@@ -142,6 +143,12 @@ elseif ($requestMethod === 'PUT' && preg_match('#^/api/books/(\d+)$#', $requestU
 }
 elseif ($requestMethod === 'DELETE' && preg_match('#^/api/books/(\d+)$#', $requestUri, $m)) {
     (new BookController())->deleteBook($m[1]);
+}
+
+/* ───────────────────────── Chat ───────────────────────── */
+
+elseif ($requestMethod === 'POST' && $requestUri === '/api/chats') {
+    (new ChatController())->postChat();
 }
 
 /* ───────────────────────── 기본/404 ───────────────────────── */
