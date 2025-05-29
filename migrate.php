@@ -182,12 +182,29 @@ $tables = [
         update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
-    // APIServer_like
-    "CREATE TABLE IF NOT EXISTS APIServer_like (
+    // APIServer_exhibition_like
+    "CREATE TABLE IF NOT EXISTS APIServer_exhibition_like (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
-        liked_id INT NOT NULL, # 좋아요 대상의 아이디
-        liked_type ENUM('gallery', 'exhibition', 'artist') NOT NULL,
+        exhibition_id INT NOT NULL,
+        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+
+    // APIServer_gallery_like
+    "CREATE TABLE IF NOT EXISTS APIServer_gallery_like (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        gallery_id INT NOT NULL,
+        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+
+    // APIServer_artist_like
+    "CREATE TABLE IF NOT EXISTS APIServer_artist_like (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        artist_id INT NOT NULL,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
         update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
