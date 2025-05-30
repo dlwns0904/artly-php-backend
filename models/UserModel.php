@@ -80,9 +80,7 @@ class UserModel {
     }
 
     public function update($id, $data) {
-        $stmt = $this->pdo->prepare("UPDATE APIServer_user SET
-            login_id = :userId,
-            login_pwd = :password,
+        $stmt = $this->pdo->prepare("UPDATE APIServer_user SET 
             user_name = :name,
             user_gender = :gender,
             user_age = :age,
@@ -91,14 +89,11 @@ class UserModel {
             user_img = :img,
             user_keyword = :keyword,
             admin_flag = :admin_flag,
-            gallery_id = :gallery_id,
-            update_dttm = NOW()
+            update_dtm = NOW()
             WHERE id = :id
         ");
 
         return $stmt->execute([
-            ':userId' => $data['login_id'],
-            ':password' => $data['login_pwd'],
             ':name' => $data['user_name'],
             ':gender' => $data['user_gender'],
             ':age' => $data['user_age'],
@@ -107,7 +102,6 @@ class UserModel {
             ':img' => $data['user_img'],
             ':keyword' => $data['user_keyword'],
             ':admin_flag' => $data['admin_flag'],
-            ':gallery_id' => $data['gallery_id'],
             ':id' => $id
         ]);
     }

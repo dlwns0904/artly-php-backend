@@ -79,8 +79,8 @@ class UserController {
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="login_id", type="string"),
-     *             @OA\Property(property="login_pwd", type="string"),
+     *             
+     *             
      *             @OA\Property(property="user_name", type="string"),
      *             @OA\Property(property="user_gender", type="string"),
      *             @OA\Property(property="user_age", type="integer"),
@@ -99,8 +99,8 @@ class UserController {
      *             @OA\Property(property="message", type="string"),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="id", type="integer"),
-     *                 @OA\Property(property="login_id", type="string"),
-     *                 @OA\Property(property="login_pwd", type="string"),
+     *                 
+     *                 
      *                 @OA\Property(property="user_name", type="string"),
      *                 @OA\Property(property="user_gender", type="string"),
      *                 @OA\Property(property="user_age", type="integer"),
@@ -112,7 +112,7 @@ class UserController {
      *                 @OA\Property(property="gallery_id", type="integer"),
      *                 @OA\Property(property="last_login_time", type="string", format="date-time"),
      *                 @OA\Property(property="reg_time", type="string", format="date-time"),
-     *                 @OA\Property(property="update_dttm", type="string", format="date-time")
+     *                 @OA\Property(property="update_dtm", type="string", format="date-time")
      *             )
      *         )
      *     ),

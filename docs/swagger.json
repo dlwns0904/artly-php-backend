@@ -858,6 +858,336 @@
                 }
             }
         },
+        "/api/books/{id}": {
+            "get": {
+                "tags": [
+                    "Book"
+                ],
+                "summary": "도록 상세 조회",
+                "operationId": "d0cdb2c8b40f41e1b52fdaf16ddace44",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "book": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "book_title": {
+                                                    "type": "string"
+                                                },
+                                                "book_poster": {
+                                                    "type": "string"
+                                                },
+                                                "exhibition_id": {
+                                                    "type": "integer"
+                                                },
+                                                "create_dtm": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "update_dtm": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "book_pages": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "book_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "art_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "book_page_sequence": {
+                                                        "type": "integer"
+                                                    },
+                                                    "book_page_description": {
+                                                        "type": "string"
+                                                    },
+                                                    "create_dtm": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "update_dtm": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "도록 없음"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Book"
+                ],
+                "summary": "도록 수정",
+                "operationId": "884f6cf493d19c8b68c54957c48baf60",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "book_title": {
+                                        "type": "string"
+                                    },
+                                    "book_poster": {
+                                        "type": "string"
+                                    },
+                                    "exhibition_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "수정 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "book_title": {
+                                                    "type": "string"
+                                                },
+                                                "book_poster": {
+                                                    "type": "string"
+                                                },
+                                                "exhibition_id": {
+                                                    "type": "integer"
+                                                },
+                                                "create_dtm": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "update_dtm": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "도록 없음"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Book"
+                ],
+                "summary": "도록 삭제",
+                "operationId": "ebd496572b00c2b7af849b0551c5eff3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "삭제 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "도록 없음 또는 삭제 실패"
+                    }
+                }
+            }
+        },
+        "/api/books": {
+            "post": {
+                "tags": [
+                    "Book"
+                ],
+                "summary": "도록 등록",
+                "operationId": "76ea4bb15d7c30d133c8c08fbc1b3d42",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "book_title": {
+                                        "type": "string"
+                                    },
+                                    "book_poster": {
+                                        "type": "string"
+                                    },
+                                    "exhibition_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "등록 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "book_title": {
+                                                    "type": "string"
+                                                },
+                                                "book_poster": {
+                                                    "type": "string"
+                                                },
+                                                "exhibition_id": {
+                                                    "type": "integer"
+                                                },
+                                                "create_dtm": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "update_dtm": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/chats": {
+            "post": {
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "AI 챗봇 대화 요청",
+                "operationId": "4badc608de578eeb074eb678dbab9ec5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "example": "이번주에 전시회 뭐 볼만한거 있어?"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "AI 챗봇 응답",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "이번주 추천 전시회는 ..."
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/exhibitions": {
             "get": {
                 "tags": [
@@ -869,7 +1199,7 @@
                     {
                         "name": "status",
                         "in": "query",
-                        "description": "전시회 상태",
+                        "description": "전시회 상태scheduled, exhibited, ended",
                         "required": false,
                         "schema": {
                             "type": "string"
@@ -1181,17 +1511,15 @@
                     {
                         "name": "status",
                         "in": "query",
-                        "description": "전시 상태",
-                        "required": false,
+                        "description": "exhibited",
                         "schema": {
                             "type": "string"
                         }
                     },
                     {
-                        "name": "region",
+                        "name": "regions",
                         "in": "query",
-                        "description": "지역",
-                        "required": false,
+                        "description": "(서울/경기,인천/부산,울산,경남) 여러 지역일 경우 콤마로 구분",
                         "schema": {
                             "type": "string"
                         }
@@ -1199,10 +1527,32 @@
                     {
                         "name": "type",
                         "in": "query",
-                        "description": "공간 형태",
-                        "required": false,
+                        "description": "미술관/박물관/갤러리/복합문화공간/대안공간",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "distance",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
                         }
                     }
                 ],
@@ -1301,43 +1651,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "상세 조회 성공",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "gallery_name": {
-                                            "type": "string"
-                                        },
-                                        "gallery_image": {
-                                            "type": "string"
-                                        },
-                                        "gallery_address": {
-                                            "type": "string"
-                                        },
-                                        "gallery_start_time": {
-                                            "type": "string"
-                                        },
-                                        "gallery_end_time": {
-                                            "type": "string"
-                                        },
-                                        "gallery_closed_day": {
-                                            "type": "string"
-                                        },
-                                        "gallery_category": {
-                                            "type": "string"
-                                        },
-                                        "gallery_description": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "상세 조회 성공"
                     },
                     "404": {
                         "description": "갤러리 없음"
@@ -2046,12 +2360,6 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "login_id": {
-                                        "type": "string"
-                                    },
-                                    "login_pwd": {
-                                        "type": "string"
-                                    },
                                     "user_name": {
                                         "type": "string"
                                     },
@@ -2100,12 +2408,6 @@
                                                 "id": {
                                                     "type": "integer"
                                                 },
-                                                "login_id": {
-                                                    "type": "string"
-                                                },
-                                                "login_pwd": {
-                                                    "type": "string"
-                                                },
                                                 "user_name": {
                                                     "type": "string"
                                                 },
@@ -2141,7 +2443,7 @@
                                                     "type": "string",
                                                     "format": "date-time"
                                                 },
-                                                "update_dttm": {
+                                                "update_dtm": {
                                                     "type": "string",
                                                     "format": "date-time"
                                                 }
@@ -2307,6 +2609,14 @@
         {
             "name": "Auth",
             "description": "로그인/회원가입 API"
+        },
+        {
+            "name": "Book",
+            "description": "도록 관련 API"
+        },
+        {
+            "name": "Chat",
+            "description": "AI 챗봇 관련 API"
         },
         {
             "name": "Exhibition",

@@ -87,7 +87,7 @@ class AnnouncementModel {
     }
 
     public function getAnnouncements($category = null) {
-        $sql = "SELECT id, announcement_title AS title FROM APIServer_announcement WHERE 1=1";
+        $sql = "SELECT id, announcement_title AS title, announcement_start_datetime AS start_datetime, announcement_end_datetime AS end_datetime, announcement_organizer AS organizer  FROM APIServer_announcement WHERE 1=1";
         $params = [];
 
         if (!empty($category)) {
@@ -112,6 +112,12 @@ class AnnouncementModel {
         ");
         $stmt->execute([':id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+   public function getAnnouncementsBySearch($filters = []) {
+    $search = $filters['search'];
+    $stmt = $this->pdo->prepare("SELECT * FROM APIServer_announcement WHERE announcement_title LIKE :search");
+    $stmt->execute([':search' => "%$search%"]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 

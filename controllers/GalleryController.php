@@ -94,9 +94,12 @@ class GalleryController {
      *     path="/api/galleries",
      *     summary="갤러리 목록 조회",
      *     tags={"Gallery"},
-     *     @OA\Parameter(name="status", in="query", description="전시 상태", required=false, @OA\Schema(type="string")),
-     *     @OA\Parameter(name="region", in="query", description="지역", required=false, @OA\Schema(type="string")),
-     *     @OA\Parameter(name="type", in="query", description="공간 형태", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="status", in="query", description="exhibited", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="regions", in="query", description="(서울/경기,인천/부산,울산,경남) 여러 지역일 경우 콤마로 구분", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="type", in="query", description="미술관/박물관/갤러리/복합문화공간/대안공간", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="latitude", in="query",  @OA\Schema(type="number", format="float")),
+     *     @OA\Parameter(name="longitude", in="query", @OA\Schema(type="number", format="float")),
+     *     @OA\Parameter(name="distance", in="query", @OA\Schema(type="integer")),
      *     @OA\Response(
      *         response=200,
      *         description="조회 성공",
@@ -110,9 +113,12 @@ class GalleryController {
      */
     public function getGalleryList() {
         $filters = [
-            'status' => $_GET['status'] ?? null,
-            'region' => $_GET['region'] ?? null,
-            'type' => $_GET['type'] ?? null
+            'status'    => $_GET['status'] ?? null,
+            'regions'    => $_GET['regions'] ?? null,
+            'type'      => $_GET['type'] ?? null,
+            'latitude'  => $_GET['latitude'] ?? null,
+            'longitude' => $_GET['longitude'] ?? null,
+            'distance'  => $_GET['distance'] ?? null
         ];
         $galleries = $this->model->getGalleries($filters);
         header('Content-Type: application/json');
@@ -125,21 +131,7 @@ class GalleryController {
      *     summary="갤러리 상세 조회",
      *     tags={"Gallery"},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(
-     *         response=200,
-     *         description="상세 조회 성공",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="gallery_name", type="string"),
-     *             @OA\Property(property="gallery_image", type="string"),
-     *             @OA\Property(property="gallery_address", type="string"),
-     *             @OA\Property(property="gallery_start_time", type="string"),
-     *             @OA\Property(property="gallery_end_time", type="string"),
-     *             @OA\Property(property="gallery_closed_day", type="string"),
-     *             @OA\Property(property="gallery_category", type="string"),
-     *             @OA\Property(property="gallery_description", type="string")
-     *         )
-     *     ),
+     *     @OA\Response(response=200, description="상세 조회 성공"),
      *     @OA\Response(response=404, description="갤러리 없음")
      * )
      */

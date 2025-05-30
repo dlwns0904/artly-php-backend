@@ -22,7 +22,7 @@ class ExhibitionController {
      *     path="/api/exhibitions",
      *     summary="전시회 목록 조회",
      *     tags={"Exhibition"},
-     *     @OA\Parameter(name="status", in="query", description="전시회 상태", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="status", in="query", description="전시회 상태scheduled, exhibited, ended", required=false, @OA\Schema(type="string")),
      *     @OA\Parameter(name="category", in="query", description="전시회 카테고리", required=false, @OA\Schema(type="string")),
      *     @OA\Response(
      *         response=200,

@@ -14,26 +14,56 @@ class LikeModel {
     }
 
     public function create($userId, $data) {
-        $stmt = $this->pdo->prepare("INSERT INTO APIServer_like
-            (user_id, liked_id, liked_type, create_dtm, update_dtm)
-            VALUES (:user_id, :liked_id, :liked_type, NOW(), NOW())");
+        $likedId = $data['liked_id'];
+        $likedType = $data['liked_type'];
+
+        $allowedTables = [
+            'gallery' => 'APIServer_gallery_like',
+            'exhibition' => 'APIServer_exhibition_like',
+            'artist' => 'APIServer_artist_like'
+        ];
+        $allowedColumn = [
+            'gallery' => 'gallery_id',
+            'exhibition' => 'exhibition_id',
+            'artist' => 'artist_id'
+        ];
+        $table = $allowedTables[$likedType];
+        $column = $allowedColumn[$likedType];
+        
+        $stmt = $this->pdo->prepare("INSERT INTO `{$table}`
+            (user_id, `{$column}`, create_dtm, update_dtm)
+            VALUES (:user_id, :liked_id, NOW(), NOW())");
 
         return $stmt->execute([
             ':user_id' => $userId,
-            ':liked_id' => $data['liked_id'],
-            ':liked_type' => $data['liked_type']
+            ':liked_id' => $likedId
         ]);
     }
 
     public function delete($userId, $data) {
+        $likedId = $data['liked_id'];
+        $likedType = $data['liked_type'];
+
+        $allowedTables = [
+            'gallery' => 'APIServer_gallery_like',
+            'exhibition' => 'APIServer_exhibition_like',
+            'artist' => 'APIServer_artist_like'
+        ];
+        $allowedColumn = [
+            'gallery' => 'gallery_id',
+            'exhibition' => 'exhibition_id',
+            'artist' => 'artist_id'
+        ];
+        $table = $allowedTables[$likedType];
+        $column = $allowedColumn[$likedType];
+
         $stmt = $this->pdo->prepare(
-            "DELETE FROM APIServer_like 
-             WHERE user_id = :user_id and liked_id = :liked_id and liked_type = :liked_type");
+            "DELETE FROM `{$table}`
+             WHERE user_id = :user_id and `{$column}` = :liked_id");
              
         $stmt->execute([
             ':user_id' => $userId,
             ':liked_id' => $data['liked_id'],
-            ':liked_type' => $data['liked_type']
         ]);
 
         return $stmt->rowCount() > 0; // 삭제된 행이 있어야 true
@@ -60,5 +90,3 @@ class LikeModel {
         return $stmt->fetchColumn() > 0;
     }
 }
-
-
