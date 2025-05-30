@@ -15,18 +15,51 @@ class ExhibitionModel {
 
     # 전시회 목록
     public function getExhibitions($filters = []) {
-        $sql = "SELECT * FROM APIServer_exhibition WHERE 1=1";
+        $sql = "SELECT A.*, case when B.like_count is null then 0 else B.like_count  end AS like_count
+                FROM APIServer_exhibition A LEFT JOIN (SELECT exhibition_id, count(*) as like_count FROM APIServer_exhibition_like group by exhibition_id) B
+                ON A.id = B.exhibition_id
+                WHERE 1=1";
         $params = [];
 
+        # 전시 상태
         if (!empty($filters['status'])) {
             $sql .= " AND exhibition_status = :status";
             $params[':status'] = $filters['status'];
         }
-
+        # 전시 카테고리
         if (!empty($filters['category'])) {
             $sql .= " AND exhibition_category = :category";
             $params[':category'] = $filters['category'];
         }
+        # 지역 -> 콤마(,)로 구분하여 입력
+        if (!empty($filters['region'])) {
+            $regions = preg_split(',', $filters['region']);
+            $regionConditions = [];
+            foreach ($regions as $index => $region) {
+                $placeholder = ":region_$index";
+                $regionConditions[] = "exhibition_location LIKE $placeholder";
+                $params[$placeholder] = '%' . trim($region) . '%';
+            }
+            if (!empty($regionConditions)) {
+                $sql .= " AND (" . implode(" OR ", $regionConditions) . ")";
+            }
+        }
+        # 정렬 순서
+        if (!empty($filters['sort'])) {
+            switch ($filters['sort']) {
+                case 'latest': # 최신순
+                    $orderBy = 'create_dttm DESC';
+                    break;
+                case 'ending': # 종료순
+                    $orderBy = 'exhibition_end_date';
+                    break;
+                case 'popular': # 인기순
+                    $orderBy = 'like_count DESC';
+                    break;
+            }
+            $sql .= " ORDER BY {$orderBy}";
+        }
+        
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);

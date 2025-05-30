@@ -22,18 +22,54 @@ class ExhibitionController {
      *     path="/api/exhibitions",
      *     summary="전시회 목록 조회",
      *     tags={"Exhibition"},
-     *     @OA\Parameter(name="status", in="query", description="전시회 상태", required=false, @OA\Schema(type="string")),
-     *     @OA\Parameter(name="category", in="query", description="전시회 카테고리", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(
+     *          name="status", 
+     *          in="query", 
+     *          description="전시회 상태 (scheduled, exhibited, ended)", 
+     *          required=false, 
+     *          @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *          name="category", 
+     *          in="query", 
+     *          description="전시회 카테고리 (회화, 미디어, 디자인, 사진, 키즈아트, 특별전시, 조각, 설치미술, 공예, 소장품전, 테마전, 기획전)", 
+     *          required=false, 
+     *          @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *          name="region", 
+     *          in="query", 
+     *          description="전시회 지역 (서울, 경기, 인천, 대구, 경북, 부산, 울산, 경남, 광주, 전라, 대전, 충청, 세종, 제주, 강원)", 
+     *          required=false, 
+     *          @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *          name="sort", 
+     *          in="query", 
+     *          description="전시회 정렬 순서 (latest: 최신순, ending: 종료순, popular: 인기순 - 좋아요 수로 정렬)", 
+     *          required=false, 
+     *          @OA\Schema(type="string")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="성공",
      *         @OA\JsonContent(type="array", @OA\Items(
      *             @OA\Property(property="id", type="integer"),
      *             @OA\Property(property="exhibition_title", type="string"),
+     *             @OA\Property(property="exhibition_poster", type="string"),
      *             @OA\Property(property="exhibition_category", type="string"),
+     *             @OA\Property(property="exhibition_start_date", type="string", format="date"),
+     *             @OA\Property(property="exhibition_end_date", type="string", format="date"),
+     *             @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
+     *             @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
+     *             @OA\Property(property="exhibition_location", type="string"),
+     *             @OA\Property(property="exhibition_price", type="integer"),
+     *             @OA\Property(property="gallery_id", type="integer"),
+     *             @OA\Property(property="exhibition_tag", type="string"),
      *             @OA\Property(property="exhibition_status", type="string"),
      *             @OA\Property(property="create_dtm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dtm", type="string", format="date-time")
+     *             @OA\Property(property="update_dtm", type="string", format="date-time"),
+     *             @OA\Property(property="like_count", type="integer")
      *         ))
      *     )
      * )
@@ -43,6 +79,8 @@ class ExhibitionController {
         $filters = [
             'status' => $_GET['status'] ?? null,
             'category' => $_GET['category'] ?? null,
+            'region' => $_GET['region'] ?? null,
+            'sort' => $_GET['sort'] ?? null,
         ];
         $exhibitions = $this->model->getExhibitions($filters);
         header('Content-Type: application/json');
@@ -61,7 +99,16 @@ class ExhibitionController {
      *         @OA\JsonContent(
      *             @OA\Property(property="id", type="integer"),
      *             @OA\Property(property="exhibition_title", type="string"),
+     *             @OA\Property(property="exhibition_poster", type="string"),
      *             @OA\Property(property="exhibition_category", type="string"),
+     *             @OA\Property(property="exhibition_start_date", type="string", format="date"),
+     *             @OA\Property(property="exhibition_end_date", type="string", format="date"),
+     *             @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
+     *             @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
+     *             @OA\Property(property="exhibition_location", type="string"),
+     *             @OA\Property(property="exhibition_price", type="integer"),
+     *             @OA\Property(property="gallery_id", type="integer"),
+     *             @OA\Property(property="exhibition_tag", type="string"),
      *             @OA\Property(property="exhibition_status", type="string"),
      *             @OA\Property(property="create_dtm", type="string", format="date-time"),
      *             @OA\Property(property="update_dtm", type="string", format="date-time")
@@ -100,12 +147,21 @@ class ExhibitionController {
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string"),
      *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="integer"),
-     *                 @OA\Property(property="exhibition_title", type="string"),
-     *                 @OA\Property(property="exhibition_category", type="string"),
-     *                 @OA\Property(property="exhibition_status", type="string"),
-     *                 @OA\Property(property="create_dtm", type="string", format="date-time"),
-     *                 @OA\Property(property="update_dtm", type="string", format="date-time")
+     *                  @OA\Property(property="id", type="integer"),
+     *                  @OA\Property(property="exhibition_title", type="string"),
+     *                  @OA\Property(property="exhibition_poster", type="string"),
+     *                  @OA\Property(property="exhibition_category", type="string"),
+     *                  @OA\Property(property="exhibition_start_date", type="string", format="date"),
+     *                  @OA\Property(property="exhibition_end_date", type="string", format="date"),
+     *                  @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
+     *                  @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
+     *                  @OA\Property(property="exhibition_location", type="string"),
+     *                  @OA\Property(property="exhibition_price", type="integer"),
+     *                  @OA\Property(property="gallery_id", type="integer"),
+     *                  @OA\Property(property="exhibition_tag", type="string"),
+     *                  @OA\Property(property="exhibition_status", type="string"),
+     *                  @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *                  @OA\Property(property="update_dtm", type="string", format="date-time")
      *             )
      *         )
      *     )
@@ -147,12 +203,21 @@ class ExhibitionController {
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string"),
      *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="integer"),
-     *                 @OA\Property(property="exhibition_title", type="string"),
-     *                 @OA\Property(property="exhibition_category", type="string"),
-     *                 @OA\Property(property="exhibition_status", type="string"),
-     *                 @OA\Property(property="create_dtm", type="string", format="date-time"),
-     *                 @OA\Property(property="update_dtm", type="string", format="date-time")
+     *                  @OA\Property(property="id", type="integer"),
+     *                  @OA\Property(property="exhibition_title", type="string"),
+     *                  @OA\Property(property="exhibition_poster", type="string"),
+     *                  @OA\Property(property="exhibition_category", type="string"),
+     *                  @OA\Property(property="exhibition_start_date", type="string", format="date"),
+     *                  @OA\Property(property="exhibition_end_date", type="string", format="date"),
+     *                  @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
+     *                  @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
+     *                  @OA\Property(property="exhibition_location", type="string"),
+     *                  @OA\Property(property="exhibition_price", type="integer"),
+     *                  @OA\Property(property="gallery_id", type="integer"),
+     *                  @OA\Property(property="exhibition_tag", type="string"),
+     *                  @OA\Property(property="exhibition_status", type="string"),
+     *                  @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *                  @OA\Property(property="update_dtm", type="string", format="date-time")
      *             )
      *         )
      *     ),
