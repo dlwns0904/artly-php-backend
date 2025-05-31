@@ -32,7 +32,9 @@ class GalleryController {
      *             @OA\Property(property="gallery_end_time", type="string"),
      *             @OA\Property(property="gallery_closed_day", type="string"),
      *             @OA\Property(property="gallery_category", type="string"),
-     *             @OA\Property(property="gallery_description", type="string")
+     *             @OA\Property(property="gallery_description", type="string"),
+     *             @OA\Property(property="gallery_latitude", type="number", format="float"),
+     *             @OA\Property(property="gallery_longitude", type="number", format="float")
      *         )
      *     ),
      *     @OA\Response(response=201, description="갤러리 생성 완료")

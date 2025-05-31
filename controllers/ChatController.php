@@ -8,10 +8,9 @@ use Middlewares\AuthMiddleware;
 /**
  * @OA\Tag(
  *     name="Chat",
- *     description="AI 챗봇 관련 API"
- * )
+ *     description="챗봇 관련 API"
+ * ) 
  */
-
 class ChatController {
     private $model;
 
@@ -23,32 +22,59 @@ class ChatController {
         $this->api_key = $_ENV['openaiApiKey'];
         $this->systemPrompt = "당신은 사용자의 질문에 답을 하기 위해 제작된, Artly 앱의 안내 챗봇 Artlas입니다.";
     }
-    
 
-       /**
-     * @OA\Post(
-     *     path="/api/chats",
-     *     summary="AI 챗봇 대화 요청",
+    
+    /**
+     * @OA\Get(
+     *     path="/api/chats/me",
+     *     summary="내 챗봇 대화 내역 조회",
      *     tags={"Chat"},
-     *     security={{"bearerAuth": {}}},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"text"},
-     *             @OA\Property(property="text", type="string", example="이번주에 전시회 뭐 볼만한거 있어?")
-     *         )
-     *     ),
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="AI 챗봇 응답",
+     *         description="성공",
      *         @OA\JsonContent(
-     *             type="string",
-     *             example="이번주 추천 전시회는 ..."
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="role", type="string", example="user"),
+     *                 @OA\Property(property="content", type="string", example="전시 일정 알려줘"),
+     *                 @OA\Property(property="create_dtm", type="string", format="date-time", example="2025-05-31 12:34:56")
+     *             )
      *         )
      *     )
      * )
      */
-    # 사용자 채팅 입력
+    public function getMyConversations() {
+        $user = $this->auth->authenticate(); // JWT 검사
+        $userId = $user->user_id;
+
+        $myConversations = $this->getConversations($userId);
+        header('Content-Type: application/json');
+        echo json_encode($myConversations, JSON_UNESCAPED_UNICODE);
+    }
+    
+    /**
+     * @OA\Post(
+     *     path="/api/chats",
+     *     summary="챗봇 질문 입력 (GPT 호출)",
+     *     tags={"Chat"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="text", type="string", example="이번주에 서울에서 볼만한 전시 추천해줘")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="챗봇 응답",
+     *         @OA\JsonContent(
+     *             type="string",
+     *             example="이번 주 추천 전시는 '빛과 그림자'입니다. 서울 강남구 예술로에서 6월 5일까지 진행됩니다."
+     *         )
+     *     )
+     * )
+     */
     public function postChat() {
         $user = $this->auth->authenticate(); // JWT 검사
         $userId = $user->user_id;
@@ -89,24 +115,26 @@ class ChatController {
         $intent = $jsonObject['intent']['object'];
         $filters = $jsonObject['entity'] ?? [];
 
-         switch ($intent) {
-             case 'exhibition':
-                 $gptResponse = $this->exhibitionRoutine($userId, $filters, $userText);
-                 break;
-             case 'artist':
-                 $gptResponse = $this->artistRoutine($userId, $filters, $userText);
-                 break;
-             case 'gallery':
-                 $gptResponse = $this->galleryRoutine($userId, $filters, $userText);
-                 break;
-             case 'news':
-                 $gptResponse = $this->announcementRoutine($userId, $filters, $userText);
-                 break;
-             default:
-                 $gptResponse = $this->defaultRoutine($userId, $userText);
-         }
+        switch ($intent) {
+            case 'exhibition':
+                $gptResponse = $this->exhibitionRoutine($userId, $filters, $userText);
+                break;
+            case 'artist':
+                $gptResponse = $this->artistRoutine($userId, $filters, $userText);
+                break;
+            case 'gallery':
+                $gptResponse = $this->galleryRoutine($userId, $filters, $userText);
+                break;
+            case 'news':
+                $gptResponse = $this->announcementRoutine($userId, $filters, $userText);
+                break;
+            default:
+                $gptResponse = $this->defaultRoutine($userId, $userText);
+        }
 
-         echo print_r($gptResponse, true);
+        $this->model->addConversations($userId, 'assistant', $gptResponse);
+        header('Content-Type: application/json');
+        echo json_encode($gptResponse, JSON_UNESCAPED_UNICODE);
     }
 
     # GPT와 대화
@@ -169,7 +197,6 @@ class ChatController {
             return $noResultRes;
         }
         else {
-	    $exhibitionList = '';
             foreach (array_slice($exhibitions, 0, 10) as $idx => $row) {
                 $exhibitionList .= ($idx + 1) . '. "' . $row['exhibition_title'] . '", ' . $row['exhibition_category'] . ', ' .
                                 $row['exhibition_start_date'] . ' ~ ' . $row['exhibition_end_date'] . ', ' .
@@ -187,7 +214,6 @@ class ChatController {
             PROMPT;
 
             $finalRes = $this->chatWithGPT($userId, $finalPrompt, $this->gpt_model_response, $this->systemPrompt);
-            $this->model->addConversations($userId, 'assistant', $exhibitionList);
             return $finalRes;
         }
     }
@@ -219,8 +245,6 @@ class ChatController {
             PROMPT;
 
             $finalRes = $this->chatWithGPT($userId, $finalPrompt, $this->gpt_model_response, $this->systemPrompt);
-            # 대화 내용 저장
-            $this->model->addConversations($userId, 'assistant', $artistList);
             return $finalRes;
         }
     }
@@ -254,8 +278,6 @@ class ChatController {
             PROMPT;
 
             $finalRes = $this->chatWithGPT($userId, $finalPrompt, $this->gpt_model_response, $this->systemPrompt);
-            # 대화 내용 저장
-            $this->model->addConversations($userId, 'assistant', $galleryList);
             return $finalRes;
         }
     }
@@ -287,8 +309,6 @@ class ChatController {
             PROMPT;
 
             $finalRes = $this->chatWithGPT($userId, $finalPrompt, $this->gpt_model_response, $this->systemPrompt);
-            # 대화 내용 저장
-            $this->model->addConversations($userId, 'assistant', $announcementList);
             return $finalRes;
         }
     }
@@ -305,5 +325,3 @@ class ChatController {
         return $defaultRes;
     }
 }
-
-

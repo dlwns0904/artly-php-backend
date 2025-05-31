@@ -6,27 +6,46 @@ use Firebase\JWT\Key;
 use Exception;
 
 class AuthMiddleware {
-    function authenticate() {
-        $headers = getallheaders();
-        $authHeader = $headers['Authorization'] ?? '';
 
-        if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+    private static $secret = 'jwt-secret-key';
+
+   public static function decodeToken() {
+    $headers = getallheaders();
+    error_log("Headers: " . json_encode($headers));  // 추가
+    $authHeader = $headers['Authorization'] ?? '';
+
+    if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+        error_log("Authorization header not found");
+        return null;
+    }
+
+    try {
+        return JWT::decode($matches[1], new Key(self::$secret, 'HS256'));
+    } catch (Exception $e) {
+        error_log("Token decode error: " . $e->getMessage());
+        return null;
+    }
+}
+
+
+    public static function getUserId() {
+    $decoded = self::decodeToken();
+    if ($decoded && isset($decoded->user_id)) {
+        return $decoded->user_id;
+    }
+    if ($decoded && isset($decoded->id)) {  // <-- 이거 추가
+        return $decoded->id;
+    }
+    return null;
+}
+    public function authenticate() {
+        $decoded = self::decodeToken();
+        if (!$decoded) {
             http_response_code(401);
-            echo json_encode(['message' => 'Authorization token not found']);
+            echo json_encode(['message' => 'Invalid or missing token']);
             exit;
         }
-
-        $jwt = $matches[1];
-        $secret = 'jwt-secret-key'; # 임시로 작성
-
-        try {
-            $decoded = JWT::decode($jwt, new Key($secret, 'HS256'));
-            return $decoded;
-        } catch (Exception $e) {
-            http_response_code(401);
-            echo json_encode(['message' => 'Invalid token']);
-            exit;
-        }
+        return $decoded;
     }
 }
 

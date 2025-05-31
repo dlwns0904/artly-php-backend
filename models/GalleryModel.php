@@ -15,10 +15,10 @@ class GalleryModel {
     public function create($data) {
         $sql = "INSERT INTO APIServer_gallery (
             gallery_name, gallery_image, gallery_address, gallery_start_time,
-            gallery_end_time, gallery_closed_day, gallery_category, gallery_description
+            gallery_end_time, gallery_closed_day, gallery_category, gallery_description, gallery_latitude, gallery_longitude
         ) VALUES (
             :name, :image, :address, :start_time,
-            :end_time, :closed_day, :category, :description
+            :end_time, :closed_day, :category, :description, :latitude, :longitude
         )";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
@@ -29,7 +29,9 @@ class GalleryModel {
             ':end_time' => $data['gallery_end_time'],
             ':closed_day' => $data['gallery_closed_day'],
             ':category' => $data['gallery_category'],
-            ':description' => $data['gallery_description']
+            ':description' => $data['gallery_description'],
+            ':latitude' => $data['gallery_latitude'] ?? null,
+            ':longitude' => $data['gallery_longitude'] ?? null
         ]);
 
         $id = $this->pdo->lastInsertId();
