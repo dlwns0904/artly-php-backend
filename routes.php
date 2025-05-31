@@ -150,6 +150,9 @@ elseif ($requestMethod === 'DELETE' && preg_match('#^/api/books/(\d+)$#', $reque
 
 /* ───────────────────────── Chat ───────────────────────── */
 
+elseif ($requestMethod === 'GET' && $requestUri === '/api/chats') {
+    (new ChatController())->getMyConversations();
+}
 elseif ($requestMethod === 'POST' && $requestUri === '/api/chats') {
     (new ChatController())->postChat();
 }
