@@ -15,9 +15,11 @@ class ExhibitionModel {
 
     # 전시회 목록
     public function getExhibitions($filters = []) {
-        $sql = "SELECT A.*, case when B.like_count is null then 0 else B.like_count  end AS like_count
+        $sql = "SELECT A.*, case when B.like_count is null then 0 else B.like_count  end AS like_count, C.gallery_name, C.gallery_image, C.gallery_address, C.gallery_start_time, C.gallery_end_time,
+		                C. gallery_closed_day, C.gallery_category, C.gallery_description
                 FROM APIServer_exhibition A LEFT JOIN (SELECT exhibition_id, count(*) as like_count FROM APIServer_exhibition_like group by exhibition_id) B
                 ON A.id = B.exhibition_id
+                LEFT JOIN APIServer_gallery C ON A.gallery_id = C.id
                 WHERE 1=1";
         $params = [];
 
@@ -63,7 +65,42 @@ class ExhibitionModel {
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = [];
+
+        # 응답 형식 가공
+        foreach ($rows as $row) {
+            $results[] = [
+                "id" => (int)$row['id'],
+                "exhibition_title" => $row['exhibition_title'],
+                "exhibition_poster" => $row['exhibition_poster'],
+                "exhibition_category" => $row['exhibition_category'],
+                "exhibition_start_date" => $row['exhibition_start_date'],
+                "exhibition_end_date" => $row['exhibition_end_date'],
+                "exhibition_start_time" => $row['exhibition_start_time'],
+                "exhibition_end_time" => $row['exhibition_end_time'],
+                "exhibition_location" => $row['exhibition_location'],
+                "exhibition_price" => (int)$row['exhibition_price'],
+                "exhibition_tag" => $row['exhibition_tag'],
+                "exhibition_status" => $row['exhibition_status'],
+                "create_dtm" => $row['create_dtm'],
+                "update_dtm" => $row['update_dtm'],
+                "like_count" => (int)$row['like_count'],
+                "gallery_id" => (int)$row['gallery_id'],
+                "exhibition_organization" => [
+                    "name" => $row['gallery_name'],
+                    "image" => $row['gallery_image'] ?? null,
+                    "address" => $row['gallery_address'],
+                    "start_time" => $row['gallery_start_time'] ?? null,
+                    "end_time" => $row['gallery_end_time'] ?? null,
+                    "closed_day" => $row['gallery_closed_day'] ?? null,
+                    "category" => $row['gallery_category'] ?? null,
+                    "description" => $row['gallery_description'] ?? null
+                ]
+            ];
+        }
+
+        return $results;
     }
 
     public function getById($id) {
