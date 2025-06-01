@@ -258,11 +258,12 @@ class UserController {
         $userId = $user->user_id;
 
         $likeExhibitions = $this->model->getMyLikeExhibitions($userId);
-        if ($likeExhibitions) {
-            echo json_encode($likeExhibitions, JSON_UNESCAPED_UNICODE);
-        } else {
-            http_response_code(404);
-            echo json_encode(['message' => 'Like Exhibitions not found']);
-        }
+        $likeGalleries = $this->model->getMyLikeGalleries($userId);
+        $likeArtists = $this->model->getMyLikeArtists($userId);
+        echo json_encode([
+            'like_exhibitions' => $likeExhibitions,
+            'like_galleries' => $likeGalleries,
+            'like_artists' => $likeArtists
+        ], JSON_UNESCAPED_UNICODE);
     }
 }

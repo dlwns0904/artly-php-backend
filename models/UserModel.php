@@ -58,9 +58,30 @@ class UserModel {
     public function getMyLikeExhibitions($userId) {
         $stmt = $this->pdo->prepare(
             "SELECT A.*
-             FROM APIServer_exhibition A, APIServer_like B
-             WHERE B.liked_type = 'exhibition' 
-             AND A.id = B.liked_id 
+             FROM APIServer_exhibition A, APIServer_exhibition_like B
+             WHERE A.id = B.exhibition_id 
+             AND B.user_id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    # 사용자의 좋아요한 갤러리 정보 가져오기
+    public function getMyLikeGalleries($userId) {
+        $stmt = $this->pdo->prepare(
+            "SELECT A.*
+             FROM APIServer_gallery A, APIServer_gallery_like B
+             WHERE A.id = B.gallery_id 
+             AND B.user_id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    # 사용자의 좋아요한 작가 정보 가져오기
+    public function getMyLikeArtists($userId) {
+        $stmt = $this->pdo->prepare(
+            "SELECT A.*
+             FROM APIServer_artist A, APIServer_artist_like B
+             WHERE A.id = B.artist_id 
              AND B.user_id = ?");
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
