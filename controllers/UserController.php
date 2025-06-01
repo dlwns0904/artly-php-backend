@@ -225,34 +225,72 @@ class UserController {
     }
     
     /**
-     * @OA\Get(
-     *     path="/api/users/me/likes",
-     *     summary="내 좋아요 전시회",
-     *     tags={"User"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="성공",
-     *         @OA\JsonContent(type="array", @OA\Items(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="exhibition_title", type="string"),
-     *             @OA\Property(property="exhibition_poster", type="string"),
-     *             @OA\Property(property="exhibition_category", type="string"),
-     *             @OA\Property(property="exhibition_start_date", type="date-time"),
-     *             @OA\Property(property="exhibition_end_date", type="date-time"),
-     *             @OA\Property(property="exhibition_start_time", type="date-time"),
-     *             @OA\Property(property="exhibition_end_time", type="date-time"),
-     *             @OA\Property(property="exhibition_location", type="string"),
-     *             @OA\Property(property="exhibition_price", type="integer"),
-     *             @OA\Property(property="gallery_id", type="integer"),
-     *             @OA\Property(property="exhibition_tag", type="string"),
-     *             @OA\Property(property="exhibition_status", type="string"),
-     *             @OA\Property(property="create_dtm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dtm", type="string", format="date-time")
-     *         ))
-     *     ),
-     *     @OA\Response(response=404, description="내 좋아요 전시회 없음")
-     * )
-     */
+ * @OA\Get(
+ *     path="/api/users/me/likes",
+ *     summary="내 좋아요 목록",
+ *     tags={"User"},
+ *     @OA\Response(
+ *         response=200,
+ *         description="성공",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="like_exhibitions",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="exhibition_title", type="string"),
+ *                     @OA\Property(property="exhibition_poster", type="string"),
+ *                     @OA\Property(property="exhibition_category", type="string"),
+ *                     @OA\Property(property="exhibition_start_date", type="string", format="date"),
+ *                     @OA\Property(property="exhibition_end_date", type="string", format="date"),
+ *                     @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
+ *                     @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
+ *                     @OA\Property(property="exhibition_location", type="string"),
+ *                     @OA\Property(property="exhibition_price", type="integer"),
+ *                     @OA\Property(property="gallery_id", type="integer"),
+ *                     @OA\Property(property="exhibition_tag", type="string"),
+ *                     @OA\Property(property="exhibition_status", type="string"),
+ *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+ *                     @OA\Property(property="update_dtm", type="string", format="date-time")
+ *                 )
+ *             ),
+ *             @OA\Property(
+ *                 property="like_galleries",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="gallery_name", type="string"),
+ *                     @OA\Property(property="gallery_image", type="string"),
+ *                     @OA\Property(property="gallery_address", type="string"),
+ *                     @OA\Property(property="gallery_start_time", type="string", format="date"),
+ *                     @OA\Property(property="gallery_end_time", type="string", format="date"),
+ *                     @OA\Property(property="gallery_closed_day", type="string", format="date-time"),
+ *                     @OA\Property(property="gallery_category", type="string", format="string"),
+ *                     @OA\Property(property="gallery_description", type="string"),
+ *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+ *                     @OA\Property(property="update_dtm", type="string", format="date-time")
+ *                 )
+ *             ),
+ *             @OA\Property(
+ *                 property="like_artists",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="artist_image", type="string"),
+ *                     @OA\Property(property="artist_name", type="string"),
+ *                     @OA\Property(property="artist_category", type="string"),
+ *                     @OA\Property(property="artist_nation", type="string", format="string"),
+ *                     @OA\Property(property="artist_description", type="string", format="string"),
+ *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+ *                     @OA\Property(property="update_dtm", type="string", format="date-time")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=404, description="내 좋아요 목록 없음")
+ * )
+ */
     public function getMyLikes() {
         $user = $this->auth->authenticate(); // JWT 검사
         $userId = $user->user_id;
