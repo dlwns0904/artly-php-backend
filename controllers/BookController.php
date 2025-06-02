@@ -20,35 +20,58 @@ class BookController {
     } 
 
     /**
-     * @OA\Get(
-     *     path="/api/books/{id}",
-     *     summary="도록 상세 조회",
-     *     tags={"Book"},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(
-     *         response=200,
-     *         description="성공",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="book_title", type="string"),
-     *             @OA\Property(property="book_poster", type="string"),
-     *             @OA\Property(property="exhibition_id", type="integer"),
-     *             @OA\Property(property="create_dtm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dtm", type="string", format="date-time")
-     *         )
-     *         @OA\JsonContent(type="array", @OA\Items(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="book_id", type="integer"),
-     *             @OA\Property(property="art_id", type="integer"),
-     *             @OA\Property(property="book_page_sequence", type="integer"),
-     *             @OA\Property(property="book_page_description", type="string"),
-     *             @OA\Property(property="create_dtm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dtm", type="string", format="date-time")
-     *         ))
-     *     ),
-     *     @OA\Response(response=404, description="도록 없음")
-     * )
-     */
+ * @OA\Get(
+ *     path="/api/books/{id}",
+ *     summary="도록 상세 조회",
+ *     tags={"Book"},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="성공",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="book", type="object",
+ *                 @OA\Property(property="book", type="object",
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="book_title", type="string"),
+ *                     @OA\Property(property="book_poster", type="string")
+ *                 ),
+ *                 @OA\Property(property="exhibition", type="object",
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="exhibition_title", type="string"),
+ *                     @OA\Property(property="exhibition_start_date", type="string", format="date"),
+ *                     @OA\Property(property="exhibition_end_date", type="string", format="date"),
+ *                     @OA\Property(property="exhibition_location", type="string")
+ *                 ),
+ *                 @OA\Property(property="gallery", type="object",
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="gallery_name", type="string"),
+ *                     @OA\Property(property="gallery_latitude", type="number", format="float", nullable=true),
+ *                     @OA\Property(property="gallery_longitude", type="number", format="float", nullable=true)
+ *                 )
+ *             ),
+ *             @OA\Property(
+ *                 property="book_pages",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="book_id", type="integer"),
+ *                     @OA\Property(property="art_id", type="integer"),
+ *                     @OA\Property(property="book_page_sequence", type="integer"),
+ *                     @OA\Property(property="book_page_description", type="string"),
+ *                     @OA\Property(property="create_dttm", type="string", format="date-time"),
+ *                     @OA\Property(property="update_dttm", type="string", format="date-time")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=404, description="도록 없음")
+ * )
+ */
     public function getBookById($id) {
         $user = $this->auth->authenticate(); // JWT 검사
         $bookInfo = $this->model->getBookInfoById($id);

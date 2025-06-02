@@ -15,9 +15,35 @@ class BookModel {
 
     # 도록에 대한 기본 정보
     public function getBookInfoById($id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_book WHERE id = :id");
+        $stmt = $this->pdo->prepare("SELECT *
+                                     FROM APIServer_book A, APIServer_exhibition B, APIServer_gallery C
+                                     WHERE A.exhibition_id = B.id and B.gallery_id = C.id and A.id = :id");
         $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // 응답 형태 가공
+        $result = [
+            'book' => [
+                'id' => $row['id'],
+                'book_title' => $row['book_title'],
+                'book_poster' => $row['book_poster'],
+            ],
+            'exhibition' => [
+                'id' => $row['exhibition_id'],
+                'exhibition_title' => $row['exhibition_title'],
+                'exhibition_start_date' => $row['exhibition_start_date'],
+                'exhibition_end_date' => $row['exhibition_end_date'],
+                'exhibition_location' => $row['exhibition_location'],
+            ],
+            'gallery' => [
+                'id' => $row['gallery_id'],
+                'gallery_name' => $row['gallery_name'],
+                'gallery_latitude' => $row['gallery_latitude'],
+                'gallery_longitude' => $row['gallery_longitude'],
+            ],
+        ];
+
+        return $result;
     }
 
     # 도록 상세 페이지 목록

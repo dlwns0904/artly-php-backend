@@ -51,29 +51,47 @@ class ExhibitionController {
      *          @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
-     *         response=200,
-     *         description="성공",
-     *         @OA\JsonContent(type="array", @OA\Items(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="exhibition_title", type="string"),
-     *             @OA\Property(property="exhibition_poster", type="string"),
-     *             @OA\Property(property="exhibition_category", type="string"),
-     *             @OA\Property(property="exhibition_start_date", type="string", format="date"),
-     *             @OA\Property(property="exhibition_end_date", type="string", format="date"),
-     *             @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
-     *             @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
-     *             @OA\Property(property="exhibition_location", type="string"),
-     *             @OA\Property(property="exhibition_price", type="integer"),
-     *             @OA\Property(property="gallery_id", type="integer"),
-     *             @OA\Property(property="exhibition_tag", type="string"),
-     *             @OA\Property(property="exhibition_status", type="string"),
-     *             @OA\Property(property="create_dtm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dtm", type="string", format="date-time"),
-     *             @OA\Property(property="like_count", type="integer")
-     *         ))
-     *     )
-     * )
-     */
+ *         response=200,
+ *         description="성공",
+ *         @OA\JsonContent(
+ *             type="array",
+ *             @OA\Items(
+ *                 @OA\Property(property="id", type="integer"),
+ *                 @OA\Property(property="exhibition_title", type="string"),
+ *                 @OA\Property(property="exhibition_poster", type="string"),
+ *                 @OA\Property(property="exhibition_category", type="string"),
+ *                 @OA\Property(property="exhibition_start_date", type="string", format="date"),
+ *                 @OA\Property(property="exhibition_end_date", type="string", format="date"),
+ *                 @OA\Property(property="exhibition_start_time", type="string", format="time"),
+ *                 @OA\Property(property="exhibition_end_time", type="string", format="time"),
+ *                 @OA\Property(property="exhibition_location", type="string"),
+ *                 @OA\Property(property="exhibition_price", type="integer"),
+ *                 @OA\Property(property="exhibition_tag", type="string"),
+ *                 @OA\Property(property="exhibition_status", type="string", enum={"scheduled", "ongoing", "ended"}),
+ *                 @OA\Property(property="create_dtm", type="string", format="date-time"),
+ *                 @OA\Property(property="update_dtm", type="string", format="date-time"),
+ *                 @OA\Property(property="like_count", type="integer"),
+ *                 @OA\Property(property="is_liked", type="boolean"),
+ *                 @OA\Property(property="gallery_id", type="integer"),
+ *                 @OA\Property(
+ *                     property="exhibition_organization",
+ *                     type="object",
+ *                     @OA\Property(property="name", type="string"),
+ *                     @OA\Property(property="image", type="string"),
+ *                     @OA\Property(property="address", type="string"),
+ *                     @OA\Property(property="start_time", type="string", format="time"),
+ *                     @OA\Property(property="end_time", type="string", format="time"),
+ *                     @OA\Property(property="closed_day", type="string"),
+ *                     @OA\Property(property="category", type="string"),
+ *                     @OA\Property(property="description", type="string"),
+ *                     @OA\Property(property="latitude", type="float"),
+ *                     @OA\Property(property="longitude", type="float")
+ *                 )
+ *             )
+ *         )
+ *     )
+ * )
+ */
     public function getExhibitionList() {
         // 쿼리 파라미터 읽기
         $filters = [
