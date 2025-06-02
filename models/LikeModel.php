@@ -20,12 +20,14 @@ class LikeModel {
         $allowedTables = [
             'gallery' => 'APIServer_gallery_like',
             'exhibition' => 'APIServer_exhibition_like',
-            'artist' => 'APIServer_artist_like'
+            'artist' => 'APIServer_artist_like',
+            'art' => 'APIServer_art_like'
         ];
         $allowedColumn = [
             'gallery' => 'gallery_id',
             'exhibition' => 'exhibition_id',
-            'artist' => 'artist_id'
+            'artist' => 'artist_id',
+            'art' => 'art_id'
         ];
         $table = $allowedTables[$likedType];
         $column = $allowedColumn[$likedType];
@@ -47,12 +49,14 @@ class LikeModel {
         $allowedTables = [
             'gallery' => 'APIServer_gallery_like',
             'exhibition' => 'APIServer_exhibition_like',
-            'artist' => 'APIServer_artist_like'
+            'artist' => 'APIServer_artist_like',
+            'art' => 'APIServer_art_like'
         ];
         $allowedColumn = [
             'gallery' => 'gallery_id',
             'exhibition' => 'exhibition_id',
-            'artist' => 'artist_id'
+            'artist' => 'artist_id',
+            'art' => 'art_id'
         ];
         $table = $allowedTables[$likedType];
         $column = $allowedColumn[$likedType];
@@ -76,7 +80,8 @@ class LikeModel {
         $allowedTables = [
             'gallery' => 'APIServer_gallery',
             'exhibition' => 'APIServer_exhibition',
-            'artist' => 'APIServer_artist'
+            'artist' => 'APIServer_artist',
+            'art' => 'APIServer_art'
         ];
 
         if (!array_key_exists($likedType, $allowedTables)) {

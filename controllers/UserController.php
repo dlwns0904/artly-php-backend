@@ -285,6 +285,20 @@ class UserController {
  *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
  *                     @OA\Property(property="update_dtm", type="string", format="date-time")
  *                 )
+ *             ),
+ *             @OA\Property(
+ *                 property="like_arts",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="art_image", type="string"),
+ *                     @OA\Property(property="artist_id", type="integer"),
+ *                     @OA\Property(property="art_title", type="string"),
+ *                     @OA\Property(property="art_description", type="string", format="string"),
+ *                     @OA\Property(property="art_docent", type="string", format="string"),
+ *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+ *                     @OA\Property(property="update_dtm", type="string", format="date-time")
+ *                 )
  *             )
  *         )
  *     ),
@@ -298,10 +312,12 @@ class UserController {
         $likeExhibitions = $this->model->getMyLikeExhibitions($userId);
         $likeGalleries = $this->model->getMyLikeGalleries($userId);
         $likeArtists = $this->model->getMyLikeArtists($userId);
+        $likeArts = $this->model->getMyLikeArts($userId);
         echo json_encode([
             'like_exhibitions' => $likeExhibitions,
             'like_galleries' => $likeGalleries,
-            'like_artists' => $likeArtists
+            'like_artists' => $likeArtists,
+            'like_arts' => $likeArts
         ], JSON_UNESCAPED_UNICODE);
     }
 }

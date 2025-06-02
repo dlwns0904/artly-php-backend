@@ -87,6 +87,17 @@ class UserModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    # 사용자의 좋아요한 작품 정보 가져오기
+    public function getMyLikeArts($userId) {
+        $stmt = $this->pdo->prepare(
+            "SELECT A.*
+             FROM APIServer_art A, APIServer_art_like B
+             WHERE A.id = B.art_id 
+             AND B.user_id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function create($data) {
         $stmt = $this->pdo->prepare("INSERT INTO APIServer_user 
             (login_id, login_pwd, user_name, user_gender, user_age, user_email, user_phone, user_img, user_keyword, admin_flag, gallery_id, last_login_time, reg_time, update_dtm)
