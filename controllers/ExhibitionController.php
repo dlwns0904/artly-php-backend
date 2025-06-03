@@ -284,4 +284,94 @@ class ExhibitionController {
             echo json_encode(['message' => 'Exhibition not found or delete failed']);
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/exhibitions/{id}/arts",
+     *     summary="전시회 작품 등록",
+     *     tags={"Exhibition"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="art_id", type="integer"),
+     *             @OA\Property(property="display_order", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="등록 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id", type="integer"),
+     *                  @OA\Property(property="exhibition_id", type="integer"),
+     *                  @OA\Property(property="art_id", type="integer"),
+     *                  @OA\Property(property="display_order", type="integer"),
+     *                  @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *                  @OA\Property(property="update_dtm", type="string", format="date-time")
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function registerArts($id) {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $registeredArt = $this->model->registerArt($id, $data);
+
+        if ($registeredArt) {
+            http_response_code(201);
+            echo json_encode([
+                'message' => 'Artworks registered successfully',
+                'data' => $registeredArt
+            ], JSON_UNESCAPED_UNICODE);
+        } else {
+            http_response_code(500);
+            echo json_encode(['message' => 'Failed to register Artworks']);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/exhibitions/{id}/artworks",
+     *     summary="전시회 작가 등록",
+     *     tags={"Exhibition"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="artist_id", type="integer"),
+     *             @OA\Property(property="role", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="등록 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id", type="integer"),
+     *                  @OA\Property(property="exhibition_id", type="integer"),
+     *                  @OA\Property(property="artist_id", type="integer"),
+     *                  @OA\Property(property="role", type="string"),
+     *                  @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *                  @OA\Property(property="update_dtm", type="string", format="date-time")
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function registerArtists($id) {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $registeredArtist = $this->model->registerArtist($id, $data);
+
+        if ($registeredArtist) {
+            http_response_code(201);
+            echo json_encode([
+                'message' => 'Artist registered successfully',
+                'data' => $registeredArtist
+            ], JSON_UNESCAPED_UNICODE);
+        } else {
+            http_response_code(500);
+            echo json_encode(['message' => 'Failed to register Artist']);
+        }
+    }
 }

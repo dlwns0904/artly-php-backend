@@ -178,6 +178,44 @@ class ExhibitionModel {
         return $stmt->execute(['id' => $id]);
     }
 
+    public function registerArt($id, $data) {
+        $stmt = $this->pdo->prepare("INSERT INTO APIServer_exhibition_art
+            (exhibition_id, art_id, display_order, create_dtm, update_dtm)
+            VALUES (:exhibition_id, :art_id, :display_order, NOW(), NOW())");
+
+        $stmt->execute([
+            ':exhibition_id' => $id,
+            ':art_id' => $data['art_id'],
+            ':display_order' => $data['display_order']
+        ]);
+
+        // 생성된 데이터의 ID 가져오기
+        $id = $this->pdo->lastInsertId();
+
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition_art WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function registerArtist($id, $data) {
+        $stmt = $this->pdo->prepare("INSERT INTO APIServer_exhibition_participation
+            (exhibition_id, artist_id, role, create_dtm, update_dtm)
+            VALUES (:exhibition_id, :artist_id, :role, NOW(), NOW())");
+
+        $stmt->execute([
+            ':exhibition_id' => $id,
+            ':artist_id' => $data['artist_id'],
+            ':role' => $data['role']
+        ]);
+
+        // 생성된 데이터의 ID 가져오기
+        $id = $this->pdo->lastInsertId();
+
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition_participation WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function getExhibitionsBySearch($filters = []) {
         $search = $filters['search'];
         $stmt = $this->pdo->prepare("SELECT * FROM APIServer_exhibition WHERE exhibition_title LIKE :search");
