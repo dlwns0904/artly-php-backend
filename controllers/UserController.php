@@ -146,7 +146,7 @@ class UserController {
      *         @OA\JsonContent(type="array", @OA\Items(
      *             @OA\Property(property="id", type="integer"),
      *             @OA\Property(property="user_id", type="integer"),
-     *             @OA\Property(property="session_id", type="integer"),
+     *             @OA\Property(property="exhibition_id", type="integer"),
      *             @OA\Property(property="reservation_datetime", type="string", format="date-time"),
      *             @OA\Property(property="reservation_number_of_tickets", type="integer"),
      *             @OA\Property(property="reservation_total_price", type="integer"),
@@ -154,10 +154,6 @@ class UserController {
      *             @OA\Property(property="reservation_status", type="string"),
      *             @OA\Property(property="create_dtm", type="string", format="date-time"),
      *             @OA\Property(property="update_dtm", type="string", format="date-time"),
-     *             @OA\Property(property="exhibition_id", type="integer"),
-     *             @OA\Property(property="session_datetime", type="string", format="date-time"),
-     *             @OA\Property(property="session_total_capacity", type="integer"),
-     *             @OA\Property(property="session_reservation_capacity", type="integer"),
      *             @OA\Property(property="exhibition_title", type="string"),
      *             @OA\Property(property="exhibition_poster", type="string", format="uri"),
      *             @OA\Property(property="exhibition_category", type="string"),
@@ -169,7 +165,10 @@ class UserController {
      *             @OA\Property(property="exhibition_price", type="integer"),
      *             @OA\Property(property="gallery_id", type="integer"),
      *             @OA\Property(property="exhibition_tag", type="string"),
-     *             @OA\Property(property="exhibition_status", type="string")
+     *             @OA\Property(property="exhibition_status", type="string"),
+     *             @OA\Property(property="visitor_name", type="string"),
+     *             @OA\Property(property="visitor_email", type="string"),
+     *             @OA\Property(property="visitor_phone", type="string")
      *         ))
      *     ),
      *     @OA\Response(response=404, description="내 전시 일정 없음")

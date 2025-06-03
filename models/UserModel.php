@@ -33,14 +33,46 @@ class UserModel {
     # 사용자의 예매 정보 가져오기
     public function getMyReservations($id) {
         $stmt = $this->pdo->prepare(
-            "SELECT A.*, B.session_datetime, B.session_total_capacity, B.session_reservation_capacity, 
-                    C.exhibition_title, C.exhibition_poster, C.exhibition_category, C.exhibition_start_date, C.exhibition_end_date, C.exhibition_start_time, C.exhibition_end_time,
-                    C.exhibition_location, C.exhibition_price, C.gallery_id, C.exhibition_tag, C.exhibition_status
-             FROM APIServer_reservation A, APIServer_session B, APIServer_exhibition C
-             WHERE A.session_id = B.id AND B.exhibition_id = C.id
+            "SELECT *
+             FROM APIServer_reservation A, APIServer_exhibition B, APIServer_user C
+             WHERE A.exhibition_id = B.id AND A.user_id = C.id;
              AND A.user_id = ?");
         $stmt->execute([$id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = [];
+
+        # 응답 형식 가공
+        foreach ($rows as $row) {
+            $results[] = [
+                "id" => (int)$row['id'],
+                "user_id" => (int)$row['user_id'],
+                "exhibition_id" => (int)$row['exhibition_id'],
+                "reservation_datetime" => $row['reservation_datetime'],
+                "reservation_number_of_tickets" => $row['reservation_number_of_tickets'],
+                "reservation_total_price" => $row['reservation_total_price'],
+                "reservation_payment_method" => $row['reservation_payment_method'],
+                "reservation_status" => $row['reservation_status'],
+                "create_dtm" => $row['create_dtm'],
+                "update_dtm" => $row['update_dtm'],
+                "exhibition_title" => $row['exhibition_title'],
+                "exhibition_poster" => $row['exhibition_poster'],
+                "exhibition_category" => $row['exhibition_category'],
+                "exhibition_start_date" => $row['exhibition_start_date'],
+                "exhibition_end_date" => $row['exhibition_end_date'],
+                "exhibition_start_time" => $row['exhibition_start_time'],
+                "exhibition_end_time" => $row['exhibition_end_time'],
+                "exhibition_location" => $row['exhibition_location'],
+                "exhibition_price" => (int)$row['exhibition_price'],
+                "gallery_id" => (int)$row['gallery_id'],
+                "exhibition_tag" => $row['exhibition_tag'],
+                "exhibition_status" => $row['exhibition_status'],
+                "visitor_name" => $row['user_name'],
+                "visitor_email" => $row['user_email'],
+                "visitor_phone" => $row['user_phone']
+            ];
+        }
+
+        return $results;
     }
 
     # 사용자의 구매(도록) 정보 가져오기

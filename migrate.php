@@ -50,7 +50,7 @@ $tables = [
     "CREATE TABLE IF NOT EXISTS APIServer_reservation (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT,
-        session_id INT,
+        exhibition_id INT,
         reservation_datetime DATETIME,
         reservation_number_of_tickets INT,
         reservation_total_price INT,
