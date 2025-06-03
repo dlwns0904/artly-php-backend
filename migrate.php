@@ -9,6 +9,22 @@ try {
 }
 
 $tables = [
+
+    // APIServer_gallery
+    "CREATE TABLE IF NOT EXISTS APIServer_gallery (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        gallery_name VARCHAR(255),
+        gallery_image VARCHAR(255),
+        gallery_address VARCHAR(255),
+        gallery_start_time DATETIME,
+        gallery_end_time DATETIME,
+        gallery_closed_day VARCHAR(100),
+        gallery_category VARCHAR(100),
+        gallery_description TEXT,
+        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+
     // APIServer_user
     "CREATE TABLE IF NOT EXISTS APIServer_user (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -25,7 +41,8 @@ $tables = [
         admin_flag TINYINT DEFAULT 0,
         last_login_time DATETIME,
         reg_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (gallery_id) REFERENCES APIServer_gallery(id) ON DELETE SET NULL ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // APIServer_announcement
@@ -43,47 +60,8 @@ $tables = [
         announcement_attachment_url VARCHAR(255),
         content TEXT,
         announcement_create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
-
-    // APIServer_reservation
-    "CREATE TABLE IF NOT EXISTS APIServer_reservation (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT,
-        exhibition_id INT,
-        reservation_datetime DATETIME,
-        reservation_number_of_tickets INT,
-        reservation_total_price INT,
-        reservation_payment_method VARCHAR(50),
-        reservation_status ENUM('reserved', 'canceled', 'used'),
-        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
-
-    // APIServer_session
-    "CREATE TABLE IF NOT EXISTS APIServer_session (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        exhibition_id INT,
-        session_datetime DATETIME,
-        session_total_capacity INT,
-        session_reservation_capacity INT,
-        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
-
-    // APIServer_gallery
-    "CREATE TABLE IF NOT EXISTS APIServer_gallery (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        gallery_name VARCHAR(255),
-        gallery_image VARCHAR(255),
-        gallery_address VARCHAR(255),
-        gallery_start_time DATETIME,
-        gallery_end_time DATETIME,
-        gallery_closed_day VARCHAR(100),
-        gallery_category VARCHAR(100),
-        gallery_description TEXT,
-        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES APIServer_user(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // APIServer_exhibition
@@ -102,17 +80,24 @@ $tables = [
         exhibition_tag VARCHAR(255),
         exhibition_status ENUM('scheduled', 'exhibited', 'ended'),
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (gallery_id) REFERENCES APIServer_gallery(id) ON DELETE SET NULL ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
-    // APIServer_exhibition_participation
-    "CREATE TABLE IF NOT EXISTS APIServer_exhibition_participation (
+    // APIServer_reservation
+    "CREATE TABLE IF NOT EXISTS APIServer_reservation (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT,
         exhibition_id INT,
-        artist_id INT,
-        role VARCHAR(100),
+        reservation_datetime DATETIME,
+        reservation_number_of_tickets INT,
+        reservation_total_price INT,
+        reservation_payment_method VARCHAR(50),
+        reservation_status ENUM('reserved', 'canceled', 'used'),
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES APIServer_user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (exhibition_id) REFERENCES APIServer_exhibition(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // APIServer_artist
@@ -127,16 +112,6 @@ $tables = [
         update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
-    // APIServer_exhibition_art
-    "CREATE TABLE IF NOT EXISTS APIServer_exhibition_art (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        exhibition_id INT,
-        art_id INT,
-        display_order INT,
-        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
-
     // APIServer_art
     "CREATE TABLE IF NOT EXISTS APIServer_art (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -146,18 +121,32 @@ $tables = [
         art_description TEXT,
         art_docent TEXT,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (artist_id) REFERENCES APIServer_artist(id) ON DELETE SET NULL ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
-    // APIServer_user_book
-    "CREATE TABLE IF NOT EXISTS APIServer_user_book (
+    // APIServer_exhibition_participation
+    "CREATE TABLE IF NOT EXISTS APIServer_exhibition_participation (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT,
-        book_id INT,
-        user_book_payment_method VARCHAR(50),
-        user_book_status ENUM('unpaid', 'canceled'),
+        exhibition_id INT,
+        artist_id INT,
+        role VARCHAR(100),
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (exhibition_id) REFERENCES APIServer_exhibition(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (artist_id) REFERENCES APIServer_artist(id) ON DELETE CASCADE ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+
+    // APIServer_exhibition_art
+    "CREATE TABLE IF NOT EXISTS APIServer_exhibition_art (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        exhibition_id INT,
+        art_id INT,
+        display_order INT,
+        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (exhibition_id) REFERENCES APIServer_exhibition(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (art_id) REFERENCES APIServer_art(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // APIServer_book
@@ -167,7 +156,8 @@ $tables = [
         book_poster VARCHAR(255),
         exhibition_id INT,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (exhibition_id) REFERENCES APIServer_exhibition(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // APIServer_book_page
@@ -179,7 +169,23 @@ $tables = [
         book_page_sequence INT,
         book_page_description TEXT,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (book_id) REFERENCES APIServer_book(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (art_id) REFERENCES APIServer_art(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (artist_id) REFERENCES APIServer_artist(id) ON DELETE SET NULL ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+
+    // APIServer_user_book
+    "CREATE TABLE IF NOT EXISTS APIServer_user_book (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT,
+        book_id INT,
+        user_book_payment_method VARCHAR(50),
+        user_book_status ENUM('unpaid', 'canceled'),
+        create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES APIServer_user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (book_id) REFERENCES APIServer_book(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // APIServer_exhibition_like
@@ -188,7 +194,9 @@ $tables = [
         user_id INT NOT NULL,
         exhibition_id INT NOT NULL,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES APIServer_user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (exhibition_id) REFERENCES APIServer_exhibition(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // APIServer_gallery_like
@@ -197,7 +205,9 @@ $tables = [
         user_id INT NOT NULL,
         gallery_id INT NOT NULL,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES APIServer_user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (gallery_id) REFERENCES APIServer_gallery(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // APIServer_artist_like
@@ -206,7 +216,9 @@ $tables = [
         user_id INT NOT NULL,
         artist_id INT NOT NULL,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES APIServer_user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (artist_id) REFERENCES APIServer_artist(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // APIServer_art_like
@@ -215,7 +227,9 @@ $tables = [
         user_id INT NOT NULL,
         art_id INT NOT NULL,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES APIServer_user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (art_id) REFERENCES APIServer_art(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // APIServer_conversation
@@ -225,7 +239,8 @@ $tables = [
         role ENUM('user', 'assistant') NOT NULL,
         content TEXT NOT NULL,
         create_dtm DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        update_dtm DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES APIServer_user(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
 ];
 
