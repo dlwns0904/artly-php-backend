@@ -4,6 +4,8 @@ namespace Controllers;
 use OpenApi\Annotations as OA;
 
 use Models\ExhibitionModel;
+use Models\UserModel;
+use Middlewares\AuthMiddleware;
 /**
  * @OA\Tag(
  *     name="Exhibition",
@@ -15,6 +17,8 @@ class ExhibitionController {
 
     public function __construct() {
         $this->model = new ExhibitionModel();
+        $this->userModel = new UserModel();
+        $this->auth = new AuthMiddleware();
     }
 
     /**
@@ -175,7 +179,6 @@ class ExhibitionController {
      *                  @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
      *                  @OA\Property(property="exhibition_location", type="string"),
      *                  @OA\Property(property="exhibition_price", type="integer"),
-     *                  @OA\Property(property="gallery_id", type="integer"),
      *                  @OA\Property(property="exhibition_tag", type="string"),
      *                  @OA\Property(property="exhibition_status", type="string"),
      *                  @OA\Property(property="create_dtm", type="string", format="date-time"),
@@ -186,8 +189,22 @@ class ExhibitionController {
      * )
      */
     public function createExhibition() {
+        $user = $this->auth->authenticate(); // JWT 검사
+        $userId = $user->user_id;
+
+        # 사용자가 갤러리 사용자인지 확인
+        $userData = $this->userModel->getById($userId);
+        $gallery_id = $userData['gallery_id'] ?? null;
+        if (!isset($gallery_id) || $gallery_id === null || $gallery_id <= 0) {
+            http_response_code(403);
+            echo json_encode([
+                'message' => '권한이 없습니다.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
         $data = json_decode(file_get_contents('php://input'), true);
-        $createdExhibition = $this->model->create($data);
+        $createdExhibition = $this->model->create($data, $gallery_id);
 
         if ($createdExhibition) {
             http_response_code(201);
@@ -243,8 +260,23 @@ class ExhibitionController {
      * )
      */
     public function updateExhibition($id) {
+        $user = $this->auth->authenticate(); // JWT 검사
+        $userId = $user->user_id;
+
+        # 사용자가 해당 전시회와 관련된 갤러리 사용자인지 확인
+        $userData = $this->userModel->getById($userId);
+        $exhibition = $this->model->getById($id);
+        if ($userData['gallery_id'] != $exhibition['gallery_id']) {
+            http_response_code(403);
+            echo json_encode([
+                'message' => '권한이 없습니다.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
         $data = json_decode(file_get_contents('php://input'), true);
-        $success = $this->model->update($id, $data);
+        $gallery_id = $exhibition['gallery_id'];
+        $success = $this->model->update($id, $data, $gallery_id);
 
         if ($success) {
             $updatedExhibition = $this->model->getById($id);
@@ -275,6 +307,20 @@ class ExhibitionController {
      * )
      */
     public function deleteExhibition($id) {
+        $user = $this->auth->authenticate(); // JWT 검사
+        $userId = $user->user_id;
+
+        # 사용자가 해당 전시회와 관련된 갤러리 사용자인지 확인
+        $userData = $this->userModel->getById($userId);
+        $exhibition = $this->model->getById($id);
+        if ($userData['gallery_id'] != $exhibition['gallery_id']) {
+            http_response_code(403);
+            echo json_encode([
+                'message' => '권한이 없습니다.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
         $success = $this->model->delete($id);
 
         if ($success) {
@@ -315,6 +361,20 @@ class ExhibitionController {
      * )
      */
     public function registerArts($id) {
+        $user = $this->auth->authenticate(); // JWT 검사
+        $userId = $user->user_id;
+
+        # 사용자가 해당 전시회와 관련된 갤러리 사용자인지 확인
+        $userData = $this->userModel->getById($userId);
+        $exhibition = $this->model->getById($id);
+        if ($userData['gallery_id'] != $exhibition['gallery_id']) {
+            http_response_code(403);
+            echo json_encode([
+                'message' => '권한이 없습니다.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
         $data = json_decode(file_get_contents('php://input'), true);
         $registeredArt = $this->model->registerArt($id, $data);
 
@@ -360,6 +420,21 @@ class ExhibitionController {
      * )
      */
     public function registerArtists($id) {
+        $user = $this->auth->authenticate(); // JWT 검사
+        $userId = $user->user_id;
+
+        # 사용자가 해당 전시회와 관련된 갤러리 사용자인지 확인
+        $userData = $this->userModel->getById($userId);
+        $exhibition = $this->model->getById($id);
+        
+        if ($userData['gallery_id'] != $exhibition['gallery_id']) {
+            http_response_code(403);
+            echo json_encode([
+                'message' => '권한이 없습니다.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
         $data = json_decode(file_get_contents('php://input'), true);
         $registeredArtist = $this->model->registerArtist($id, $data);
 

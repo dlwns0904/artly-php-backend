@@ -111,7 +111,7 @@ class ExhibitionModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function create($data) {
+    public function create($data, $gallery_id) {
         $stmt = $this->pdo->prepare("INSERT INTO APIServer_exhibition
             (exhibition_title, exhibition_poster, exhibition_category, exhibition_start_date, exhibition_end_date, exhibition_start_time, exhibition_end_time, exhibition_location, exhibition_price, gallery_id, exhibition_tag, exhibition_status, create_dtm, update_dtm)
             VALUES (:title, :poster, :category, :start_date, :end_date, :start_time, :end_time, :location, :price, :gallery_id, :tag, :status, NOW(), NOW())");
@@ -126,7 +126,7 @@ class ExhibitionModel {
             ':end_time' => $data['exhibition_end_time'],
             ':location' => $data['exhibition_location'],
             ':price' => $data['exhibition_price'],
-            ':gallery_id' => $data['gallery_id'],
+            ':gallery_id' => $gallery_id,
             ':tag' => $data['exhibition_tag'],
             ':status' => $data['exhibition_status']
         ]);
@@ -139,7 +139,7 @@ class ExhibitionModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function update($id, $data) {
+    public function update($id, $data, $gallery_id) {
         $stmt = $this->pdo->prepare("UPDATE APIServer_exhibition SET
             exhibition_title = :title,
             exhibition_poster = :poster,
@@ -166,7 +166,7 @@ class ExhibitionModel {
             ':end_time' => $data['exhibition_end_time'],
             ':location' => $data['exhibition_location'],
             ':price' => $data['exhibition_price'],
-            ':gallery_id' => $data['gallery_id'],
+            ':gallery_id' => $gallery_id,
             ':tag' => $data['exhibition_tag'],
             ':status' => $data['exhibition_status'],
             ':id' => $id
