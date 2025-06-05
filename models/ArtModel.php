@@ -19,11 +19,26 @@ class ArtModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     public function getById($id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_art WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+    $stmt = $this->pdo->prepare("
+        SELECT 
+            a.*, 
+            ar.artist_name 
+        FROM 
+            APIServer_art a
+        LEFT JOIN 
+            APIServer_artist ar 
+        ON 
+            a.artist_id = ar.id
+        WHERE 
+            a.id = :id
+    ");
+    $stmt->execute(['id' => $id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+
 
     public function create($data) {
         $stmt = $this->pdo->prepare("INSERT INTO APIServer_art 

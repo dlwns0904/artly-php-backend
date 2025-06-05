@@ -3,6 +3,7 @@ namespace Controllers;
 
 use OpenApi\Annotations as OA;
 use Models\GalleryModel;
+use Middlewares\AuthMiddleware;
 
 /**
  * @OA\Tag(
@@ -12,9 +13,11 @@ use Models\GalleryModel;
  */
 class GalleryController {
     private $model;
+    private $auth;
 
     public function __construct() {
         $this->model = new GalleryModel();
+        $this->auth = new AuthMiddleware();
     }
 
     /**
@@ -96,49 +99,62 @@ class GalleryController {
      *     path="/api/galleries",
      *     summary="갤러리 목록 조회",
      *     tags={"Gallery"},
-     *     @OA\Parameter(name="status", in="query", description="exhibited", @OA\Schema(type="string")),
-     *     @OA\Parameter(name="regions", in="query", description="(서울/경기,인천/부산,울산,경남) 여러 지역일 경우 콤마로 구분", @OA\Schema(type="string")),
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="status", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="regions", in="query", description="서울/경기,인천/부산,울산,경남(여러개이면 콤마로 구분)", @OA\Schema(type="string")),
      *     @OA\Parameter(name="type", in="query", description="미술관/박물관/갤러리/복합문화공간/대안공간", @OA\Schema(type="string")),
-     *     @OA\Parameter(name="latitude", in="query",  @OA\Schema(type="number", format="float")),
+     *     @OA\Parameter(name="latitude", in="query", @OA\Schema(type="number", format="float")),
      *     @OA\Parameter(name="longitude", in="query", @OA\Schema(type="number", format="float")),
      *     @OA\Parameter(name="distance", in="query", @OA\Schema(type="integer")),
-     *     @OA\Response(
-     *         response=200,
-     *         description="조회 성공",
-     *         @OA\JsonContent(type="array", @OA\Items(
-     *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="name", type="string"),
-     *             @OA\Property(property="image", type="string")
-     *         ))
-     *     )
+     *     @OA\Parameter(name="search", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="liked_only", in="query",description="내가 좋아요한 갤러리만 보기 (true/false)",required=false,@OA\Schema(type="boolean")),
+     *     @OA\Response(response=200, description="조회 성공")
      * )
      */
-    public function getGalleryList() {
+     public function getGalleryList() {
+        $decoded = $this->auth->decodeToken();
+        $user_id = $decoded && isset($decoded->user_id) ? $decoded->user_id : null;
+        $likedOnly = $_GET['liked_only'] ?? null;
+        $likedOnlyBool = filter_var($likedOnly, FILTER_VALIDATE_BOOLEAN);
+
+        if ($likedOnlyBool && !$user_id) {
+            http_response_code(401);
+            echo json_encode(['message' => '로그인 후 사용 가능합니다.']);
+            return;
+        }
+
         $filters = [
-            'status'    => $_GET['status'] ?? null,
-            'regions'    => $_GET['regions'] ?? null,
+            'regions'   => $_GET['regions'] ?? null,
             'type'      => $_GET['type'] ?? null,
             'latitude'  => $_GET['latitude'] ?? null,
             'longitude' => $_GET['longitude'] ?? null,
-            'distance'  => $_GET['distance'] ?? null
+            'distance'  => $_GET['distance'] ?? null,
+            'search'    => $_GET['search'] ?? null,
+            'liked_only'=> $likedOnly,
+            'user_id'   => $user_id
         ];
+
         $galleries = $this->model->getGalleries($filters);
         header('Content-Type: application/json');
         echo json_encode($galleries, JSON_UNESCAPED_UNICODE);
     }
 
-    /**
+      /**
      * @OA\Get(
      *     path="/api/galleries/{id}",
      *     summary="갤러리 상세 조회",
      *     tags={"Gallery"},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *     @OA\Response(response=200, description="상세 조회 성공"),
      *     @OA\Response(response=404, description="갤러리 없음")
      * )
      */
     public function getGalleryById($id) {
-        $gallery = $this->model->getById($id);
+        $decoded = $this->auth->decodeToken();
+        $user_id = $decoded && isset($decoded->user_id) ? $decoded->user_id : null;
+
+        $gallery = $this->model->getById($id, $user_id);
         if ($gallery) {
             header('Content-Type: application/json');
             echo json_encode($gallery, JSON_UNESCAPED_UNICODE);
@@ -147,5 +163,7 @@ class GalleryController {
             echo json_encode(['message' => 'Gallery not found']);
         }
     }
+
+
 }
 

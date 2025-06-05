@@ -2,8 +2,12 @@
 namespace Controllers;
 
 use OpenApi\Annotations as OA;
+
 use Models\UserModel;
 use Middlewares\AuthMiddleware;
+
+
+
 
 /**
  * @OA\Tag(
@@ -50,15 +54,14 @@ class UserController {
      *             @OA\Property(property="gallery_id", type="integer"),
      *             @OA\Property(property="last_login_time", type="string", format="date-time"),
      *             @OA\Property(property="reg_time", type="string", format="date-time"),
-     *             @OA\Property(property="update_dttm", type="string", format="date-time")
+     *             @OA\Property(property="update_dtm", type="string", format="date-time")
      *         )
      *     ),
      *     @OA\Response(response=404, description="프로필 없음")
      * )
      */
     public function getMe() {
-	header('Content-Type: application/json');
-        $user = $this->auth->authenticate();
+        $user = $this->auth->authenticate(); // JWT 검사
         $userId = $user->user_id;
 
         $profile = $this->model->getById($userId);
@@ -79,8 +82,8 @@ class UserController {
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             
-     *             
+     *             @OA\Property(property="login_id", type="string"),
+     *             @OA\Property(property="login_pwd", type="string"),
      *             @OA\Property(property="user_name", type="string"),
      *             @OA\Property(property="user_gender", type="string"),
      *             @OA\Property(property="user_age", type="integer"),
@@ -89,7 +92,7 @@ class UserController {
      *             @OA\Property(property="user_img", type="string"),
      *             @OA\Property(property="user_keyword", type="string"),
      *             @OA\Property(property="admin_flag", type="integer"),
-     *             @OA\Property(property="gallery_id", type="integer")
+     *             @OA\Property(property="gallery_id", type="integer"),
      *         )
      *     ),
      *     @OA\Response(
@@ -98,21 +101,21 @@ class UserController {
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string"),
      *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="integer"),
-     *                 
-     *                 
-     *                 @OA\Property(property="user_name", type="string"),
-     *                 @OA\Property(property="user_gender", type="string"),
-     *                 @OA\Property(property="user_age", type="integer"),
-     *                 @OA\Property(property="user_email", type="string"),
-     *                 @OA\Property(property="user_phone", type="string"),
-     *                 @OA\Property(property="user_img", type="string"),
-     *                 @OA\Property(property="user_keyword", type="string"),
-     *                 @OA\Property(property="admin_flag", type="integer"),
-     *                 @OA\Property(property="gallery_id", type="integer"),
-     *                 @OA\Property(property="last_login_time", type="string", format="date-time"),
-     *                 @OA\Property(property="reg_time", type="string", format="date-time"),
-     *                 @OA\Property(property="update_dtm", type="string", format="date-time")
+        *             @OA\Property(property="id", type="integer"),
+        *             @OA\Property(property="login_id", type="string"),
+        *             @OA\Property(property="login_pwd", type="string"),
+        *             @OA\Property(property="user_name", type="string"),
+        *             @OA\Property(property="user_gender", type="string"),
+        *             @OA\Property(property="user_age", type="integer"),
+        *             @OA\Property(property="user_email", type="string"),
+        *             @OA\Property(property="user_phone", type="string"),
+        *             @OA\Property(property="user_img", type="string"),
+        *             @OA\Property(property="user_keyword", type="string"),
+        *             @OA\Property(property="admin_flag", type="integer"),
+        *             @OA\Property(property="gallery_id", type="integer"),
+        *             @OA\Property(property="last_login_time", type="string", format="date-time"),
+        *             @OA\Property(property="reg_time", type="string", format="date-time"),
+        *             @OA\Property(property="update_dtm", type="string", format="date-time")
      *             )
      *         )
      *     ),
@@ -120,8 +123,7 @@ class UserController {
      * )
      */
     public function updateMe() {
-	header('Content-Type: application/json');
-        $user = $this->auth->authenticate();
+        $user = $this->auth->authenticate(); // JWT 검사
         $userId = $user->user_id;
         $data = json_decode(file_get_contents('php://input'), true);
 
@@ -151,25 +153,53 @@ class UserController {
      *     summary="내 전시 일정",
      *     tags={"User"},
      *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="성공"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="성공",
+     *         @OA\JsonContent(type="array", @OA\Items(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="session_id", type="integer"),
+     *             @OA\Property(property="reservation_datetime", type="string", format="date-time"),
+     *             @OA\Property(property="reservation_number_of_tickets", type="integer"),
+     *             @OA\Property(property="reservation_total_price", type="integer"),
+     *             @OA\Property(property="reservation_payment_method", type="string"),
+     *             @OA\Property(property="reservation_status", type="string"),
+     *             @OA\Property(property="create_dtm", type="string", format="date-time"),
+     *             @OA\Property(property="update_dtm", type="string", format="date-time"),
+     *             @OA\Property(property="exhibition_id", type="integer"),
+     *             @OA\Property(property="session_datetime", type="string", format="date-time"),
+     *             @OA\Property(property="session_total_capacity", type="integer"),
+     *             @OA\Property(property="session_reservation_capacity", type="integer"),
+     *             @OA\Property(property="exhibition_title", type="string"),
+     *             @OA\Property(property="exhibition_poster", type="string", format="uri"),
+     *             @OA\Property(property="exhibition_category", type="string"),
+     *             @OA\Property(property="exhibition_start_date", type="string", format="date"),
+     *             @OA\Property(property="exhibition_end_date", type="string", format="date"),
+     *             @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
+     *             @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
+     *             @OA\Property(property="exhibition_location", type="string"),
+     *             @OA\Property(property="exhibition_price", type="integer"),
+     *             @OA\Property(property="gallery_id", type="integer"),
+     *             @OA\Property(property="exhibition_tag", type="string"),
+     *             @OA\Property(property="exhibition_status", type="string")
+     *         ))
+     *     ),
      *     @OA\Response(response=404, description="내 전시 일정 없음")
      * )
      */
-public function getMyReservations() {
-    header('Content-Type: application/json');
-    $user = $this->auth->authenticate();
-    $userId = $user->user_id;
+    public function getMyReservations() {
+        $user = $this->auth->authenticate(); // JWT 검사
+        $userId = $user->user_id;
 
-    $reservations = $this->model->getMyReservations($userId);
-    if ($reservations && count($reservations) > 0) {
-        echo json_encode($reservations, JSON_UNESCAPED_UNICODE);
-    } else {
-        http_response_code(404);
-        echo json_encode(['message' => 'Reservation not found']);
+        $reservations = $this->model->getMyReservations($userId);
+        if ($reservations) {
+            echo json_encode($reservations, JSON_UNESCAPED_UNICODE);
+        } else {
+            http_response_code(404);
+            echo json_encode(['message' => 'Reservation not found']);
+        }
     }
-}
-
-
 
     /**
      * @OA\Get(
@@ -177,64 +207,118 @@ public function getMyReservations() {
      *     summary="내 구매 내역",
      *     tags={"User"},
      *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="성공"),
-     *     @OA\Response(response=404, description="내 구매 내역 없음")
-     * )
-     */
-public function getMyPurchases() {
-    header('Content-Type: application/json');
-    $user = $this->auth->authenticate();
-    $userId = $user->user_id;
-
-    $purchases = $this->model->getMyPurchases($userId);
-    if ($purchases && count($purchases) > 0) {
-        echo json_encode($purchases, JSON_UNESCAPED_UNICODE);
-    } else {
-        http_response_code(404);
-        echo json_encode(['message' => 'Purchases not found']);
-    }
-}
- /**
-     * @OA\Get(
-     *     path="/api/users/me/likes",
-     *     summary="내 좋아요 전시회",
-     *     tags={"User"},
      *     @OA\Response(
      *         response=200,
      *         description="성공",
      *         @OA\JsonContent(type="array", @OA\Items(
      *             @OA\Property(property="id", type="integer"),
-     *             @OA\Property(property="exhibition_title", type="string"),
-     *             @OA\Property(property="exhibition_poster", type="string"),
-     *             @OA\Property(property="exhibition_category", type="string"),
-     *             @OA\Property(property="exhibition_start_date", type="date-time"),
-     *             @OA\Property(property="exhibition_end_date", type="date-time"),
-     *             @OA\Property(property="exhibition_start_time", type="date-time"),
-     *             @OA\Property(property="exhibition_end_time", type="date-time"),
-     *             @OA\Property(property="exhibition_location", type="string"),
-     *             @OA\Property(property="exhibition_price", type="integer"),
-     *             @OA\Property(property="gallery_id", type="integer"),
-     *             @OA\Property(property="exhibition_tag", type="string"),
-     *             @OA\Property(property="exhibition_status", type="string"),
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="book_id", type="integer"),
+     *             @OA\Property(property="user_book_payment_method", type="string"),
+     *             @OA\Property(property="user_book_status", type="string"),
      *             @OA\Property(property="create_dtm", type="string", format="date-time"),
-     *             @OA\Property(property="update_dtm", type="string", format="date-time")
+     *             @OA\Property(property="update_dtm", type="string", format="date-time"),
+     *             @OA\Property(property="book_title", type="string"),
+     *             @OA\Property(property="book_poster", type="string", format="uri")
      *         ))
      *     ),
-     *     @OA\Response(response=404, description="내 좋아요 전시회 없음")
+     *     @OA\Response(response=404, description="내 구매 내역 없음")
      * )
      */
+    public function getMyPurchases() {
+        $user = $this->auth->authenticate(); // JWT 검사
+        $userId = $user->user_id;
+
+        $purchases = $this->model->getMyPurchases($userId);
+        if ($purchases) {
+            echo json_encode($purchases, JSON_UNESCAPED_UNICODE);
+        } else {
+            http_response_code(404);
+            echo json_encode(['message' => 'Purchases not found']);
+        }
+    }
+    
+    /**
+ * @OA\Get(
+ *     path="/api/users/me/likes",
+ *     summary="내 좋아요 목록",
+ *     tags={"User"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="성공",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="like_exhibitions",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="exhibition_title", type="string"),
+ *                     @OA\Property(property="exhibition_poster", type="string"),
+ *                     @OA\Property(property="exhibition_category", type="string"),
+ *                     @OA\Property(property="exhibition_start_date", type="string", format="date"),
+ *                     @OA\Property(property="exhibition_end_date", type="string", format="date"),
+ *                     @OA\Property(property="exhibition_start_time", type="string", format="date-time"),
+ *                     @OA\Property(property="exhibition_end_time", type="string", format="date-time"),
+ *                     @OA\Property(property="exhibition_location", type="string"),
+ *                     @OA\Property(property="exhibition_price", type="integer"),
+ *                     @OA\Property(property="gallery_id", type="integer"),
+ *                     @OA\Property(property="exhibition_tag", type="string"),
+ *                     @OA\Property(property="exhibition_status", type="string"),
+ *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+ *                     @OA\Property(property="update_dtm", type="string", format="date-time")
+ *                 )
+ *             ),
+ *             @OA\Property(
+ *                 property="like_galleries",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="gallery_name", type="string"),
+ *                     @OA\Property(property="gallery_image", type="string"),
+ *                     @OA\Property(property="gallery_address", type="string"),
+ *                     @OA\Property(property="gallery_start_time", type="string", format="date"),
+ *                     @OA\Property(property="gallery_end_time", type="string", format="date"),
+ *                     @OA\Property(property="gallery_closed_day", type="string", format="date-time"),
+ *                     @OA\Property(property="gallery_category", type="string", format="string"),
+ *                     @OA\Property(property="gallery_description", type="string"),
+ *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+ *                     @OA\Property(property="update_dtm", type="string", format="date-time")
+ *                 )
+ *             ),
+ *             @OA\Property(
+ *                 property="like_artists",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="artist_image", type="string"),
+ *                     @OA\Property(property="artist_name", type="string"),
+ *                     @OA\Property(property="artist_category", type="string"),
+ *                     @OA\Property(property="artist_nation", type="string", format="string"),
+ *                     @OA\Property(property="artist_description", type="string", format="string"),
+ *                     @OA\Property(property="create_dtm", type="string", format="date-time"),
+ *                     @OA\Property(property="update_dtm", type="string", format="date-time")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=404, description="내 좋아요 목록 없음")
+ * )
+ */
     public function getMyLikes() {
         $user = $this->auth->authenticate(); // JWT 검사
         $userId = $user->user_id;
 
         $likeExhibitions = $this->model->getMyLikeExhibitions($userId);
-        if ($likeExhibitions) {
-            echo json_encode($likeExhibitions, JSON_UNESCAPED_UNICODE);
-        } else {
-            http_response_code(404);
-            echo json_encode(['message' => 'Like Exhibitions not found']);
-        }
+        $likeGalleries = $this->model->getMyLikeGalleries($userId);
+        $likeArtists = $this->model->getMyLikeArtists($userId);
+        $likeArts = $this->model->getMyLikeArts($userId);
+        echo json_encode([
+            'like_exhibitions' => $likeExhibitions,
+            'like_galleries' => $likeGalleries,
+            'like_artists' => $likeArtists,
+            'like_arts' => $likeArts
+        ], JSON_UNESCAPED_UNICODE);
     }
-
 }
-

@@ -63,6 +63,13 @@ elseif ($requestMethod === 'DELETE' && preg_match('#^/api/exhibitions/(\d+)$#', 
     (new ExhibitionController())->deleteExhibition($m[1]);
 }
 
+elseif ($requestMethod === 'POST' && preg_match('#^/api/exhibitions/(\d+)/artists$#', $requestUri, $m)) {
+    (new ExhibitionController())->registerArtists($m[1]);
+}
+elseif ($requestMethod === 'POST' && preg_match('#^/api/exhibitions/(\d+)/arts$#', $requestUri, $m)) {
+    (new ExhibitionController())->registerArts($m[1]);
+}
+
 /* ───────────────────────── Art ───────────────────────── */
 
 elseif ($requestMethod === 'GET' && preg_match('#^/api/arts/(\d+)$#', $requestUri, $m)) {
@@ -165,6 +172,11 @@ elseif ($requestMethod === 'DELETE' && preg_match('#^/api/reservations/(\d+)$#',
     (new ReservationController())->cancelReservation($m[1]);
 }
 
+// 예약 수정 (PATCH /api/reservations/{id})
+elseif ($requestMethod === 'PATCH' && preg_match('#^/api/reservations/(\d+)$#', $requestUri, $m)) {
+    (new ReservationController())->updateReservation($m[1]);
+}
+
 /* ───────────────────────── Like ───────────────────────── */
 
 elseif ($requestMethod === 'POST' && $requestUri === '/api/likes') {
@@ -189,14 +201,25 @@ elseif ($requestMethod === 'DELETE' && preg_match('#^/api/books/(\d+)$#', $reque
     (new BookController())->deleteBook($m[1]);
 }
 
+/* ───────────────────────── User 도록 구매 ───────────────────────── */
+
+elseif ($requestMethod === 'POST' && $requestUri === '/api/users/me/books') {
+    (new BookController())->purchaseBook();
+}
+elseif ($requestMethod === 'DELETE' && preg_match('#^/api/users/me/books/(\d+)$#', $requestUri, $m)) {
+    (new BookController())->deletePurchasedBook($m[1]);
+}
+
 /* ───────────────────────── Chat ───────────────────────── */
 
-elseif ($requestMethod === 'GET' && $requestUri === '/api/chats') {
+elseif ($requestMethod === 'GET' && $requestUri === '/api/chats/me') {
     (new ChatController())->getMyConversations();
 }
 elseif ($requestMethod === 'POST' && $requestUri === '/api/chats') {
     (new ChatController())->postChat();
 }
+
+
 
 /* ───────────────────────── 기본/404 ───────────────────────── */
 

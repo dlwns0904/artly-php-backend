@@ -122,31 +122,36 @@ class AnnouncementController {
      *     summary="공고 목록 조회",
      *     tags={"Announcement"},
      *     @OA\Parameter(
-     *         name="category",
-     *         in="query",
-     *         description="공고 카테고리 (공모, 프로그램, 채용)",
-     *         required=false,
-     *         @OA\Schema(type="string")
+     *         name="category", in="query", description="공고 카테고리 (공모, 프로그램, 채용, 공지사항, FAQ)", @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="status", in="query", description="진행상태 (scheduled, ongoing, ended)", @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort", in="query", description="정렬 (latest, ending)", @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="search", in="query", description="검색어 (제목 검색)", @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
-     *         response=200,
-     *         description="공고 목록 조회 성공",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(
-     *                 @OA\Property(property="id", type="integer"),
-     *                 @OA\Property(property="title", type="string")
-     *             )
-     *         )
+     *         response=200, description="공고 목록 조회 성공"
      *     )
      * )
      */
     public function getAnnouncementList() {
-        $category = $_GET['category'] ?? null;
-        $announcements = $this->model->getAnnouncements($category);
+        $filters = [
+            'category' => $_GET['category'] ?? null,
+            'status' => $_GET['status'] ?? null,
+            'sort' => $_GET['sort'] ?? null,
+            'search' => $_GET['search'] ?? null
+        ];
+
+        $announcements = $this->model->getAnnouncements($filters);
         header('Content-Type: application/json');
         echo json_encode($announcements, JSON_UNESCAPED_UNICODE);
     }
+
+
 
     /**
      * @OA\Get(

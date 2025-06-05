@@ -26,8 +26,8 @@ class AuthController {
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="login_id", type="string"),
-     *             @OA\Property(property="login_pwd", type="string")
+     *             @OA\Property(property="login_id", type="string", example="test1"),
+     *             @OA\Property(property="login_pwd", type="string", example="test1")
      *         )
      *     ),
      *     @OA\Response(

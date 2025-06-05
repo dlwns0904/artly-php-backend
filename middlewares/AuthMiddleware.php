@@ -47,5 +47,11 @@ class AuthMiddleware {
         }
         return $decoded;
     }
+
+    public function getUserOrNull() {
+        $decoded = self::decodeToken();
+        return $decoded ?? null;
+    }
+
 }
 

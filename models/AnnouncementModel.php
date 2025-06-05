@@ -86,38 +86,82 @@ class AnnouncementModel {
         $stmt->execute([':id' => $id]);
     }
 
-    public function getAnnouncements($category = null) {
-        $sql = "SELECT id, announcement_title AS title, announcement_start_datetime AS start_datetime, announcement_end_datetime AS end_datetime, announcement_organizer AS organizer  FROM APIServer_announcement WHERE 1=1";
-        $params = [];
 
-        if (!empty($category)) {
-            $sql .= " AND announcement_category = :category";
-            $params[':category'] = $category;
+public function getAnnouncements($filters = [])
+{
+    /* 기본 SELECT 절 ------------------------------------------------------ */
+    $sql = "SELECT  id,
+                    announcement_title           AS title,
+                    announcement_start_datetime  AS start_datetime,
+                    announcement_end_datetime    AS end_datetime,
+                    announcement_organizer       AS organizer,
+                    announcement_category        AS category,
+                    announcement_status
+            FROM    APIServer_announcement
+            WHERE   1=1";
+    $params = [];
+
+    /* ① 카테고리 필터 ----------------------------------------------------- */
+    if (!empty($filters['category'])) {
+        /* 명시적으로 카테고리가 들어오면 그 값만 조회 */
+        $sql               .= " AND announcement_category = :category";
+        $params[':category'] = $filters['category'];           // (공모·프로그램·채용·공지사항·FAQ)
+    } else {
+        /* 파라미터가 없으면 공지사항·FAQ 자동 제외 */
+        $sql .= " AND announcement_category NOT IN ('공지사항','FAQ')";
+    }
+
+    /* ② 진행 상태 필터 ---------------------------------------------------- */
+    if (!empty($filters['status'])) {
+        $sql               .= " AND announcement_status = :status";        // scheduled / ongoing / ended
+        $params[':status']  = $filters['status'];
+    }
+
+    /* ③ 제목 검색 -------------------------------------------------------- */
+    if (!empty($filters['search'])) {
+        $sql               .= " AND announcement_title LIKE :search";
+        $params[':search']  = '%' . $filters['search'] . '%';
+    }
+
+    /* ④ 정렬(ended 제외 조건 포함) --------------------------------------- */
+    if (!empty($filters['sort'])) {
+        switch ($filters['sort']) {
+            case 'latest':                         // 최신순 (ended 제외)
+                $sql .= " AND announcement_status != 'ended'
+                          ORDER BY announcement_create_dtm DESC";
+                break;
+
+            case 'ending':                         // 종료 임박순 (ended 제외)
+                $sql .= " AND announcement_status != 'ended'
+                          ORDER BY announcement_end_datetime ASC";
+                break;
+
+            default:                               // 기타값 → 최신순
+                $sql .= " ORDER BY announcement_create_dtm DESC";
         }
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $sql .= " ORDER BY announcement_create_dtm DESC";     // 기본 최신순
     }
 
-    public function getById($id) {
-        $stmt = $this->pdo->prepare("
-            SELECT id, announcement_title, user_id, announcement_poster, 
-                   announcement_start_datetime, announcement_end_datetime,
-                   announcement_organizer, announcement_contact, announcement_support_detail,
-                   announcement_site_url, announcement_attachment_url, announcement_content,
-                   announcement_category
-            FROM APIServer_announcement
-            WHERE id = :id
-        ");
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+    /* ⑤ 실행 ------------------------------------------------------------- */
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute($params);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
    public function getAnnouncementsBySearch($filters = []) {
     $search = $filters['search'];
     $stmt = $this->pdo->prepare("SELECT * FROM APIServer_announcement WHERE announcement_title LIKE :search");
     $stmt->execute([':search' => "%$search%"]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+   public function getById($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_announcement WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
 

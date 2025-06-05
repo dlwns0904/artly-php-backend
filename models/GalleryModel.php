@@ -70,84 +70,171 @@ class GalleryModel {
         $stmt->execute([':id' => $id]);
     }
 
-public function getGalleries($filters = []) {
+    public function getGalleries($filters = []) {
+        $sql = "
+            SELECT
+                g.id AS gallery_id,
+                g.gallery_name,
+                g.gallery_image,
+                g.gallery_latitude,
+                g.gallery_longitude,
+                g.gallery_address,
+                g.gallery_category,
+                IFNULL(lc.like_count, 0) AS like_count,
+                IF(EXISTS (
+                    SELECT 1 FROM APIServer_gallery_like l
+                    WHERE l.gallery_id = g.id AND l.user_id = :user_id_for_like
+                ), 1, 0) AS is_liked
+            FROM APIServer_gallery g
+            LEFT JOIN (
+                SELECT gallery_id, COUNT(*) AS like_count
+                FROM APIServer_gallery_like
+                GROUP BY gallery_id
+            ) lc ON g.id = lc.gallery_id
+            WHERE 1=1
+        ";
+
+        $user_id = $filters['user_id'] ?? 0;
+        $params = [':user_id_for_like' => $user_id];
+
+        // liked_only 처리
+        $likedOnly = !empty($filters['liked_only']) && filter_var($filters['liked_only'], FILTER_VALIDATE_BOOLEAN);
+        if ($likedOnly && $user_id > 0) {
+            $sql .= " AND EXISTS (
+                SELECT 1 FROM APIServer_gallery_like l
+                WHERE l.gallery_id = g.id AND l.user_id = :user_id_only
+            )";
+            $params[':user_id_only'] = $user_id;
+        }
+
+        // 지역 필터
+        if (!empty($filters['regions'])) {
+            $regionList = explode(',', $filters['regions']);
+            $regionConditions = [];
+            foreach ($regionList as $index => $region) {
+                $key = ":region$index";
+                $regionConditions[] = "g.gallery_address LIKE $key";
+                $params[$key] = '%' . trim($region) . '%';
+            }
+            $sql .= " AND (" . implode(" OR ", $regionConditions) . ")";
+        }
+
+        // 타입 필터
+        if (!empty($filters['type'])) {
+            $sql .= " AND g.gallery_category = :type";
+            $params[':type'] = $filters['type'];
+        }
+
+        // 검색어 필터
+        if (!empty($filters['search'])) {
+            $sql .= " AND g.gallery_name LIKE :search";
+            $params[':search'] = '%' . $filters['search'] . '%';
+        }
+
+        // 거리 필터
+        if (!empty($filters['latitude']) && !empty($filters['longitude']) && !empty($filters['distance'])) {
+            $sql .= " AND (
+                6371000 * ACOS(
+                    COS(RADIANS(:latitude)) * COS(RADIANS(g.gallery_latitude)) *
+                    COS(RADIANS(g.gallery_longitude) - RADIANS(:longitude)) +
+                    SIN(RADIANS(:latitude)) * SIN(RADIANS(g.gallery_latitude))
+                )
+            ) <= :distance";
+            $params[':latitude'] = $filters['latitude'];
+            $params[':longitude'] = $filters['longitude'];
+            $params[':distance'] = $filters['distance'];
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 결과 가공
+        $results = [];
+        foreach ($rows as $row) {
+            $results[] = [
+                'id' => (int)$row['gallery_id'],
+                'gallery_name' => $row['gallery_name'],
+                'gallery_image' => $row['gallery_image'],
+                'gallery_latitude' => $row['gallery_latitude'],
+                'gallery_longitude' => $row['gallery_longitude'],
+                'gallery_address' => $row['gallery_address'],
+                'gallery_category' => $row['gallery_category'],
+                'like_count' => (int)$row['like_count'],
+                'is_liked' => (bool)$row['is_liked'],
+            ];
+        }
+
+        return $results;
+    }
+
+   public function getById($id, $user_id = null) {
     $sql = "
         SELECT
             g.id AS gallery_id,
             g.gallery_name,
             g.gallery_image,
+            g.gallery_address,
+            g.gallery_start_time,
+            g.gallery_end_time,
+            g.gallery_closed_day,
+            g.gallery_category,
+            g.gallery_description,
             g.gallery_latitude,
             g.gallery_longitude,
-            g.gallery_address,
+            IFNULL(lc.like_count, 0) AS like_count,
+            IF(EXISTS (
+                SELECT 1 FROM APIServer_gallery_like l
+                WHERE l.gallery_id = g.id AND l.user_id = :user_id_for_like
+            ), 1, 0) AS is_liked,
             e.id AS exhibition_id,
             e.exhibition_title,
             e.exhibition_poster,
             e.exhibition_status
         FROM APIServer_gallery g
+        LEFT JOIN (
+            SELECT gallery_id, COUNT(*) AS like_count
+            FROM APIServer_gallery_like
+            GROUP BY gallery_id
+        ) lc ON g.id = lc.gallery_id
         LEFT JOIN APIServer_exhibition e
             ON g.id = e.gallery_id AND e.exhibition_status = 'exhibited'
-        WHERE 1=1
+        WHERE g.id = :id
     ";
-    $params = [];
-
-    if (!empty($filters['status'])) {
-        $sql .= " AND e.exhibition_status = :status";
-        $params[':status'] = $filters['status'];
-    }
-
-    // 🔧 여기서 region 다중 검색 처리
-    if (!empty($filters['regions'])) {
-        $regionList = explode(',', $filters['regions']);
-        $regionConditions = [];
-        foreach ($regionList as $index => $region) {
-            $key = ":region$index";
-            $regionConditions[] = "g.gallery_address LIKE $key";
-            $params[$key] = '%' . trim($region) . '%';
-        }
-        $sql .= " AND (" . implode(" OR ", $regionConditions) . ")";
-    }
-
-    if (!empty($filters['type'])) {
-        $sql .= " AND g.gallery_category = :type";
-        $params[':type'] = $filters['type'];
-    }
-
-    if (!empty($filters['latitude']) && !empty($filters['longitude']) && !empty($filters['distance'])) {
-        $sql .= " AND (
-            6371000 * ACOS(
-                COS(RADIANS(:latitude)) * COS(RADIANS(g.gallery_latitude)) *
-                COS(RADIANS(g.gallery_longitude) - RADIANS(:longitude)) +
-                SIN(RADIANS(:latitude)) * SIN(RADIANS(g.gallery_latitude))
-            )
-        ) <= :distance";
-        $params[':latitude'] = $filters['latitude'];
-        $params[':longitude'] = $filters['longitude'];
-        $params[':distance'] = $filters['distance'];
-    }
 
     $stmt = $this->pdo->prepare($sql);
-    $stmt->execute($params);
+    $stmt->execute([
+        ':id' => $id,
+        ':user_id_for_like' => $user_id ?? 0
+    ]);
+
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    
-    $galleries = [];
-    foreach ($rows as $row) {
-        $gid = $row['gallery_id'];
-        if (!isset($galleries[$gid])) {
-            $galleries[$gid] = [
-                'id' => $gid,
-                'name' => $row['gallery_name'],
-                'image' => $row['gallery_image'],
-                'latitude' => $row['gallery_latitude'],
-                'longitude' => $row['gallery_longitude'],
-                'address' => $row['gallery_address'],
-                'exhibitions' => []
-            ];
-        }
+    if (empty($rows)) return null;
 
+    $firstRow = $rows[0];
+
+    $gallery = [
+        'id' => (int)$firstRow['gallery_id'],
+        'gallery_name' => $firstRow['gallery_name'],
+        'gallery_image' => $firstRow['gallery_image'],
+        'gallery_address' => $firstRow['gallery_address'],
+        'gallery_start_time' => $firstRow['gallery_start_time'],
+        'gallery_end_time' => $firstRow['gallery_end_time'],
+        'gallery_closed_day' => $firstRow['gallery_closed_day'],
+        'gallery_category' => $firstRow['gallery_category'],
+        'gallery_description' => $firstRow['gallery_description'],
+        'gallery_latitude' => $firstRow['gallery_latitude'],
+        'gallery_longitude' => $firstRow['gallery_longitude'],
+        'like_count' => (int)$firstRow['like_count'],
+        'is_liked' => (bool)$firstRow['is_liked'],
+        'exhibitions' => []
+    ];
+
+    foreach ($rows as $row) {
         if (!empty($row['exhibition_id'])) {
-            $galleries[$gid]['exhibitions'][] = [
-                'id' => $row['exhibition_id'],
+            $gallery['exhibitions'][] = [
+                'id' => (int)$row['exhibition_id'],
                 'title' => $row['exhibition_title'],
                 'poster' => $row['exhibition_poster'],
                 'status' => $row['exhibition_status']
@@ -155,74 +242,15 @@ public function getGalleries($filters = []) {
         }
     }
 
-    return array_values($galleries);
+    return $gallery;
 }
 
-    public function getById($id) {
-        $sql = "
-            SELECT
-                g.id AS gallery_id,
-                g.gallery_name,
-                g.gallery_image,
-                g.gallery_address,
-                g.gallery_start_time,
-                g.gallery_end_time,
-                g.gallery_closed_day,
-                g.gallery_category,
-                g.gallery_description,
-                g.gallery_latitude,
-                g.gallery_longitude,
-                e.id AS exhibition_id,
-                e.exhibition_title,
-                e.exhibition_poster,
-                e.exhibition_status
-            FROM APIServer_gallery g
-            LEFT JOIN APIServer_exhibition e
-                ON g.id = e.gallery_id AND e.exhibition_status = 'exhibited'
-            WHERE g.id = :id
-        ";
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (empty($rows)) return null;
-
-        $row = $rows[0];
-        $gallery = [
-            'id' => $row['gallery_id'],
-            'gallery_name' => $row['gallery_name'],
-            'gallery_image' => $row['gallery_image'],
-            'gallery_address' => $row['gallery_address'],
-            'gallery_start_time' => $row['gallery_start_time'],
-            'gallery_end_time' => $row['gallery_end_time'],
-            'gallery_closed_day' => $row['gallery_closed_day'],
-            'gallery_category' => $row['gallery_category'],
-            'gallery_description' => $row['gallery_description'],
-            'gallery_latitude' => $row['gallery_latitude'],
-            'gallery_longitude' => $row['gallery_longitude'],
-            'exhibitions' => []
-        ];
-
-        foreach ($rows as $row) {
-            if (!empty($row['exhibition_id'])) {
-                $gallery['exhibitions'][] = [
-                    'id' => $row['exhibition_id'],
-                    'title' => $row['exhibition_title'],
-                    'poster' => $row['exhibition_poster'],
-                    'status' => $row['exhibition_status']
-                ];
-            }
-        }
-
-        return $gallery;
-    }
-
-    public function getGalleriesBySearch($filters = []) {
-        $search = $filters['search'];
-        $stmt = $this->pdo->prepare("SELECT * FROM APIServer_gallery WHERE gallery_name LIKE :search");
-        $stmt->execute([':search' => "%$search%"]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+   public function getGalleriesBySearch($filters = []) {
+    $search = $filters['search'];
+    $stmt = $this->pdo->prepare("SELECT * FROM APIServer_gallery WHERE gallery_name LIKE :search");
+    $stmt->execute([':search' => "%$search%"]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 
