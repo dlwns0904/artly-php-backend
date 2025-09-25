@@ -16,7 +16,7 @@ class ReservationModel {
         $this->pdo->beginTransaction();
 
         try {
-            // 세션 남은 좌석 체크
+            // 세션에서 남은 좌석 체크
             $stmt = $this->pdo->prepare(
                 "SELECT session_total_capacity, session_reservation_capacity 
                  FROM APIServer_session WHERE id = :session_id"

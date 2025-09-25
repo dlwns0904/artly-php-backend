@@ -152,11 +152,15 @@ class AuthController {
 
     public function createJwtToken($user, $time) {
         $payload = [
-                    'iat' => time(),                 // 발급 시간
-                    'exp' => time() + ($time * 60),  // 만료 시간 / time 파라미터의 단위는 minute
-                    'user_id' => $user['id'],
-                    'login_id' => $user['login_id'],
+            'iat' => time(),                 // 발급 시간
+            'exp' => time() + ($time * 60),  // 만료 시간 / time 파라미터의 단위는 minute
+            'user_id' => $user['id'],
+            'login_id' => $user['login_id'],
         ];
+        // 관리자라면 role: 'admin' 추가
+        if (isset($user['admin_flag']) && $user['admin_flag'] == 1) {
+            $payload['role'] = 'admin';
+        }
 
         $jwt = JWT::encode($payload, $this->jwtSecret, 'HS256');
         return $jwt;

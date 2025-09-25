@@ -1,9 +1,6 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 
-use Dotenv\Dotenv;
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
 
 use Controllers\ArtistController;
 use Controllers\ExhibitionController;
@@ -15,15 +12,13 @@ use Controllers\AuthController;
 use Controllers\SearchController;
 use Controllers\LikeController;
 use Controllers\SessionController;
-use Controllers\BookController;
-use Controllers\ChatController;
+use Controllers\ReservationController;
+
 
 $requestUri = str_replace('/artly-backend', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
 
 $requestMethod  = $_SERVER['REQUEST_METHOD'];
-echo "<pre>Trying to call Controllers\\SessionController</pre>";
-var_dump(class_exists('Controllers\\SessionController')); // true면 OK
 
 #echo "<pre>requestUri: $requestUri\n";
 #echo "requestMethod: $requestMethod</pre>";
@@ -73,6 +68,9 @@ elseif ($requestMethod === 'DELETE' && preg_match('#^/api/arts/(\d+)$#', $reques
 }
 
 /* ───────────────────────── Gallery ───────────────────────── */
+elseif ($requestMethod === 'POST' && $requestUri === '/api/galleries') {
+    (new GalleryController())->createGallery();
+}
 
 elseif ($requestMethod === 'GET' && preg_match('#^/api/galleries/(\d+)$#', $requestUri, $m)) {
     (new GalleryController())->getGalleryById($m[1]);
@@ -80,6 +78,9 @@ elseif ($requestMethod === 'GET' && preg_match('#^/api/galleries/(\d+)$#', $requ
 elseif ($requestMethod === 'GET' && preg_match('#^/api/galleries$#', $requestUri)) {
     (new GalleryController())->getGalleryList();
 }
+
+/* ───────────────────────── Gallery ───────────────────────── */
+// 갤러리 생성은 GalleryAdminController에서만 처리
 
 /* ───────────────────────── Announcement ───────────────────────── */
 
@@ -124,6 +125,18 @@ elseif ($requestMethod === 'GET' && preg_match('#^/api/exhibitions/(\d+)/session
     (new \Controllers\SessionController())->getSessionsByDate($m[1]);
 }
 
+/* ───────────────────────── Reservation ───────────────────────── */
+
+// 예약 생성 (POST /api/reservations)
+elseif ($requestMethod === 'POST' && $requestUri === '/api/reservations') {
+    (new ReservationController())->createReservation();
+}
+
+// 예약 취소 (DELETE /api/reservations/{id})
+elseif ($requestMethod === 'DELETE' && preg_match('#^/api/reservations/(\d+)$#', $requestUri, $m)) {
+    (new ReservationController())->cancelReservation($m[1]);
+}
+
 /* ───────────────────────── Like ───────────────────────── */
 
 elseif ($requestMethod === 'POST' && $requestUri === '/api/likes') {
@@ -133,26 +146,7 @@ elseif ($requestMethod === 'DELETE' && $requestUri === '/api/likes') {
     (new LikeController())->deleteLike();
 }
 
-/* ───────────────────────── Book ───────────────────────── */
 
-elseif ($requestMethod === 'GET' && preg_match('#^/api/books/(\d+)$#', $requestUri, $m)) {
-    (new BookController())->getBookById($m[1]);
-}
-elseif ($requestMethod === 'POST' && $requestUri === '/api/books') {
-    (new BookController())->createBook();
-}
-elseif ($requestMethod === 'PUT' && preg_match('#^/api/books/(\d+)$#', $requestUri, $m)) {
-    (new BookController())->updateBook($m[1]);
-}
-elseif ($requestMethod === 'DELETE' && preg_match('#^/api/books/(\d+)$#', $requestUri, $m)) {
-    (new BookController())->deleteBook($m[1]);
-}
-
-/* ───────────────────────── Chat ───────────────────────── */
-
-elseif ($requestMethod === 'POST' && $requestUri === '/api/chats') {
-    (new ChatController())->postChat();
-}
 
 /* ───────────────────────── 기본/404 ───────────────────────── */
 
@@ -165,4 +159,6 @@ else {
     header('Content-Type: application/json');
     echo json_encode(['error' => 'Not found'], JSON_UNESCAPED_UNICODE);
 }
+
+
 

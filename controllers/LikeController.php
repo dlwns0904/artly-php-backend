@@ -56,10 +56,10 @@ class LikeController {
         $success = $this->model->create($userId, $data);
 
         if ($success) {
-            echo json_encode(['message' => 'Like created successfully']);
+            echo json_encode(['message' => '정상적으로 등록되었습니다.'], JSON_UNESCAPED_UNICODE);
         } else {
             http_response_code(404);
-            echo json_encode(['message' => 'Failed to create Like']);
+            echo json_encode(['message' => 'Failed to create Like'], JSON_UNESCAPED_UNICODE);
         }
     }
 
@@ -92,10 +92,10 @@ class LikeController {
         $success = $this->model->delete($userId, $data);
 
         if ($success) {
-            echo json_encode(['message' => 'Like deleted successfully']);
+            echo json_encode(['message' => '정상적으로 삭제되었습니다.'], JSON_UNESCAPED_UNICODE);
         } else {
             http_response_code(404);
-            echo json_encode(['message' => 'Like not found or delete failed']);
+            echo json_encode(['message' => 'Like not found or delete failed'], JSON_UNESCAPED_UNICODE);
         }
     }
 }
